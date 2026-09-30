@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Scholar ERP — Live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F6FA;--surface:#fff;--surface-2:#FBFBFE;--line:#E7E9F1;
+    --ink:#171A2B;--ink-2:#5A5F76;--ink-3:#8A8FA6;
+    --primary:#2B4EE6;--primary-ink:#1B34AE;--primary-wash:#EDF0FE;
+    --accent:#F59E0B;--green:#0FA968;--green-wash:#E6F7EF;--red:#E5484D;--red-wash:#FCEEEE;
+    --radius:14px;--shadow:0 1px 2px rgba(23,26,43,.05),0 10px 30px rgba(23,26,43,.07);
+    --font:"Plus Jakarta Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#0D0F1A;--surface:#161927;--surface-2:#1B1F30;--line:#272B3D;
+    --ink:#EDEEF5;--ink-2:#A6ABC2;--ink-3:#71768F;--primary:#6E88F6;--primary-ink:#AEBEFB;--primary-wash:#1E2440;
+    --green:#3ECf8E;--green-wash:#12321F;--red:#F16A6E;--red-wash:#3A1D1E;}}
+  *{box-sizing:border-box}html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{margin:0;letter-spacing:-.02em}
+  a{color:var(--primary)}
+  :focus-visible{outline:3px solid var(--primary);outline-offset:2px;border-radius:6px}
+  button{font-family:inherit;cursor:pointer}
+  input,select{font-family:inherit;width:100%;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:14px}
+  label{display:block;font-size:13px;font-weight:600;color:var(--ink-2);margin:0 0 6px}
+  .field{margin-bottom:14px}
+  .btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 16px;font-weight:600;font-size:14px;display:inline-flex;gap:7px;align-items:center;justify-content:center}
+  .btn:hover{background:var(--surface-2)}
+  .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+  .btn.primary:hover{background:var(--primary-ink)}
+  .btn.sm{padding:5px 12px;font-size:13px}
+  .btn.danger{color:var(--red);border-color:var(--red-wash)}
+  .err{background:var(--red-wash);color:var(--red);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;margin-bottom:12px;display:none}
+  .err.show{display:block}
+
+  /* Login */
+  .login-wrap{min-height:100%;display:grid;place-items:center;padding:20px}
+  .login{background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);width:100%;max-width:420px;overflow:hidden}
+  .login-head{padding:24px 24px 8px;text-align:center}
+  .brandmark{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--primary),#5B72F0);color:#fff;display:grid;place-items:center;font-weight:800;font-size:22px;margin:0 auto 12px}
+  .login-head h1{font-size:20px;font-weight:800}
+  .login-head p{color:var(--ink-3);font-size:13px;margin:4px 0 0}
+  .tabs{display:flex;gap:6px;padding:16px 24px 0}
+  .tabs button{flex:1;border:1px solid var(--line);background:var(--surface-2);color:var(--ink-2);border-radius:10px;padding:9px;font-weight:700;font-size:13px}
+  .tabs button.on{background:var(--primary-wash);color:var(--primary-ink);border-color:var(--primary-wash)}
+  .login-body{padding:16px 24px 24px}
+  .hint{font-size:11.5px;color:var(--ink-3);margin-top:-6px;margin-bottom:12px}
+
+  /* Shell */
+  .shell{display:grid;grid-template-columns:230px 1fr;min-height:100%}
+  .sidebar{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+  .brand{display:flex;align-items:center;gap:10px;padding:18px 18px 8px}
+  .brand .m{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--primary),#5B72F0);color:#fff;display:grid;place-items:center;font-weight:800}
+  .brand b{font-size:15px;font-weight:800}.brand small{display:block;color:var(--ink-3);font-size:11px}
+  .who{margin:6px 14px 8px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);font-size:12px}
+  .who b{font-size:13px}.who span{color:var(--ink-3)}
+  .nav{padding:6px 12px;flex:1;overflow:auto}
+  .nav button{display:flex;gap:10px;align-items:center;width:100%;border:0;background:none;color:var(--ink-2);padding:9px 12px;border-radius:10px;font-weight:600;font-size:14px;text-align:left;margin-bottom:1px}
+  .nav button:hover{background:var(--surface-2);color:var(--ink)}
+  .nav button.on{background:var(--primary-wash);color:var(--primary-ink)}
+  .nav .sp{flex:1}
+  .foot{padding:12px}
+  .main{min-width:0;display:flex;flex-direction:column}
+  .top{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding:14px 22px;display:flex;align-items:center;gap:12px;z-index:5}
+  .top h2{font-size:18px;font-weight:800}
+  .top .sp{flex:1}
+  .content{padding:22px;max-width:1100px;width:100%}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:18px}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+  .kpi .cap{color:var(--ink-2);font-size:13px;font-weight:600}
+  .kpi .num{font-size:26px;font-weight:800;margin-top:8px;font-variant-numeric:tabular-nums}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:18px}
+  .panel-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+  .panel-h h3{font-size:15px;font-weight:700}.panel-h .sp{flex:1}
+  .panel-b{padding:16px 18px}
+  table{width:100%;border-collapse:collapse}
+  .tbl{overflow-x:auto}
+  th{text-align:left;font-size:12px;color:var(--ink-2);font-weight:700;padding:11px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:11px 14px;border-bottom:1px solid var(--line);font-size:14px;white-space:nowrap}
+  tbody tr:last-child td{border-bottom:0}
+  .pill{font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px}
+  .pill.ok,.pill.active,.pill.paid{background:var(--green-wash);color:var(--green)}
+  .pill.no,.pill.suspended,.pill.revoked,.pill.due{background:var(--red-wash);color:var(--red)}
+  .pill.partial{background:#FEF3E2;color:#B8770B}
+  .key{font-family:ui-monospace,Menlo,Consolas,monospace;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:3px 8px;font-size:13px}
+  .row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1;min-width:160px}
+  .muted{color:var(--ink-3)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:820px){.grid2{grid-template-columns:1fr}.shell{grid-template-columns:1fr}.sidebar{position:static;height:auto}}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(120%);background:var(--ink);color:var(--surface);padding:11px 16px;border-radius:12px;font-weight:600;font-size:14px;box-shadow:var(--shadow);transition:transform .3s;z-index:50}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  "use strict";
+  const $ = s => document.querySelector(s);
+  const root = $("#root");
+  const LS = "scholar_live_session";
+
+  const S = load() || { base: defaultBase(), mode:null, tenant:"", token:"", user:null, view:"" };
+  function load(){ try{ return JSON.parse(localStorage.getItem(LS)); }catch(e){ return null; } }
+  function save(){ try{ localStorage.setItem(LS, JSON.stringify(S)); }catch(e){} }
+  function defaultBase(){ return (location.origin && location.origin.startsWith("http")) ? location.origin : "http://127.0.0.1:8000"; }
+
+  function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2600); }
+  const esc = s => (s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+  // ---- API ----
+  async function api(path, opts){
+    opts = opts || {};
+    const headers = { "Accept":"application/json", "Content-Type":"application/json" };
+    if (S.mode === "school" && S.tenant) headers["X-Tenant"] = S.tenant;
+    if (S.token) headers["Authorization"] = "Bearer " + S.token;
+    let res;
+    try {
+      res = await fetch(S.base.replace(/\/$/,"") + path, {
+        method: opts.method || "GET", headers,
+        body: opts.body ? JSON.stringify(opts.body) : undefined,
+      });
+    } catch(e){ throw { message: "Cannot reach the API at " + S.base + ". Is the server running and the URL correct?" }; }
+    let data = null; try { data = await res.json(); } catch(e){}
+    if (res.status === 401 && S.token) { doLogout(true); throw { message:"Session expired — please sign in again." }; }
+    if (!res.ok) throw { status: res.status, message: (data && (data.message || firstError(data))) || ("Request failed ("+res.status+")"), data };
+    return data;
+  }
+  function firstError(d){ if(d && d.errors){ const k=Object.keys(d.errors)[0]; return d.errors[k][0]; } return null; }
+
+  // ================= LOGIN =================
+  let loginMode = "school";
+  function renderLogin(){
+    root.innerHTML = `
+    <div class="login-wrap"><div class="login">
+      <div class="login-head">
+        <div class="brandmark">S</div>
+        <h1>Scholar ERP</h1>
+        <p>by Chenthur Info Tech</p>
+      </div>
+      <div class="tabs">
+        <button id="tabSchool" class="${loginMode==='school'?'on':''}">School login</button>
+        <button id="tabOwner" class="${loginMode==='owner'?'on':''}">Owner (control plane)</button>
+      </div>
+      <div class="login-body">
+        <div class="err" id="loginErr"></div>
+        <div class="field"><label for="base">API server URL</label><input id="base" value="${esc(S.base)}"><div class="hint">Where your Laravel API runs (e.g. http://127.0.0.1:8000)</div></div>
+        <div id="schoolFields" style="${loginMode==='owner'?'display:none':''}">
+          <div class="field"><label for="tenant">School ID</label><input id="tenant" value="${esc(S.tenant||'greenfield')}" placeholder="e.g. greenfield"></div>
+        </div>
+        <div class="field"><label for="email">Email</label><input id="email" type="email" placeholder="${loginMode==='owner'?'owner@chenthur.tech':'admin@greenfield.test'}"></div>
+        <div class="field"><label for="pass">Password</label><input id="pass" type="password" placeholder="••••••••"></div>
+        <button class="btn primary" id="signin" style="width:100%">Sign in</button>
+      </div>
+    </div></div>`;
+    $("#tabSchool").onclick = ()=>{ loginMode="school"; renderLogin(); };
+    $("#tabOwner").onclick = ()=>{ loginMode="owner"; renderLogin(); };
+    $("#signin").onclick = signIn;
+    [ "#email","#pass" ].forEach(s=> $(s).addEventListener("keydown",e=>{ if(e.key==="Enter") signIn(); }));
+  }
+  async function signIn(){
+    const err = $("#loginErr"); err.classList.remove("show");
+    S.base = $("#base").value.trim() || defaultBase();
+    const email = $("#email").value.trim(), password = $("#pass").value;
+    if(!email || !password){ err.textContent="Enter email and password."; err.classList.add("show"); return; }
+    const btn = $("#signin"); btn.disabled=true; btn.textContent="Signing in…";
+    try{
+      if(loginMode === "owner"){
+        S.mode="owner"; S.tenant=""; S.token="";
+        const r = await api("/api/central/login", { method:"POST", body:{ email, password } });
+        S.token=r.token; S.user=r.user; S.view="schools"; save(); renderApp();
+      } else {
+        S.mode="school"; S.tenant=$("#tenant").value.trim(); S.token="";
+        if(!S.tenant){ throw { message:"Enter your School ID." }; }
+        const r = await api("/api/login", { method:"POST", body:{ email, password } });
+        S.token=r.token; S.user=r.user; S.view="dashboard"; save(); renderApp();
+      }
+    }catch(e){ err.textContent = e.message || "Login failed."; err.classList.add("show"); }
+    finally{ btn.disabled=false; btn.textContent="Sign in"; }
+  }
+
+  function doLogout(silent){
+    const wasSchool = S.mode==="school";
+    if(S.token){ api(wasSchool?"/api/logout":"/api/central/logout",{method:"POST"}).catch(()=>{}); }
+    S.token=""; S.user=null; S.view=""; save();
+    if(!silent) toast("Signed out");
+    renderLogin();
+  }
+
+  // ================= APP SHELL =================
+  const SCHOOL_NAV = [["dashboard","Dashboard"],["students","Students"],["users","Users & Roles"],["fees","Fees"],["license","License"]];
+  const OWNER_NAV  = [["schools","Schools"],["licenses","Licenses"],["issue","Issue license"],["provision","Provision school"]];
+
+  function renderApp(){
+    const nav = S.mode==="owner"?OWNER_NAV:SCHOOL_NAV;
+    root.innerHTML = `
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand"><div class="m">S</div><div><b>Scholar ERP</b><small>${S.mode==="owner"?"Control plane":"School portal"}</small></div></div>
+        <div class="who"><b>${esc(S.user? (S.user.name||S.user.email):"")}</b><br><span>${S.mode==="owner"?"Chenthur Info Tech":("School: "+esc(S.tenant))}</span></div>
+        <nav class="nav" id="nav">${nav.map(([k,l])=>`<button data-v="${k}" class="${S.view===k?'on':''}">${l}</button>`).join("")}</nav>
+        <div class="foot"><button class="btn" style="width:100%" id="logout">Log out</button></div>
+      </aside>
+      <div class="main">
+        <div class="top"><h2 id="ttl"></h2><div class="sp"></div>${S.mode==="school"?'<button class="btn sm" id="chpw">Change password</button>':''}</div>
+        <div class="content" id="view"><div class="muted">Loading…</div></div>
+      </div>
+    </div>`;
+    $("#nav").querySelectorAll("button").forEach(b=> b.onclick=()=>{ S.view=b.dataset.v; save(); renderApp(); });
+    $("#logout").onclick = ()=>doLogout();
+    if($("#chpw")) $("#chpw").onclick = changePassword;
+    (S.mode==="owner"?OWNER_VIEWS:SCHOOL_VIEWS)[S.view] ? (S.view=S.view) : (S.view = S.mode==="owner"?"schools":"dashboard");
+    const map = S.mode==="owner"?OWNER_VIEWS:SCHOOL_VIEWS;
+    const titles = S.mode==="owner"?{schools:"Schools",licenses:"Licenses",issue:"Issue license",provision:"Provision school"}
+                                   :{dashboard:"Dashboard",students:"Students",users:"Users & Roles",fees:"Fees",license:"License"};
+    $("#ttl").textContent = titles[S.view]||"";
+    map[S.view]();
+  }
+  const view = () => $("#view");
+  function fail(e){ view().innerHTML = `<div class="err show">${esc(e.message||"Something went wrong.")}</div>`; }
+
+  // ================= SCHOOL VIEWS =================
+  const SCHOOL_VIEWS = {
+    async dashboard(){
+      try{
+        const d = await api("/api/dashboard");
+        view().innerHTML = `<div class="kpis">
+          ${kpi("Total students", d.total_students)}
+          ${kpi("Present today", d.present_today)}
+          ${kpi("Fees collected", "₹"+num(d.fees_collected))}
+          ${kpi("Staff on duty", d.staff_on_duty+" / "+d.staff_total)}
+        </div>
+        <div class="panel"><div class="panel-h"><h3>Connected</h3></div><div class="panel-b muted">Live data from <span class="key">${esc(S.base)}</span> · school <b>${esc(S.tenant)}</b>. All figures are read from your Laravel API.</div></div>`;
+      }catch(e){ fail(e); }
+    },
+    async students(){
+      view().innerHTML = `
+        <div class="panel"><div class="panel-h"><h3>Add student</h3></div><div class="panel-b">
+          <div class="row">
+            <div><label>Name</label><input id="sName" placeholder="Full name"></div>
+            <div><label>Class</label><input id="sClass" placeholder="e.g. Class 6-A"></div>
+            <div style="max-width:120px"><label>Roll</label><input id="sRoll" type="number"></div>
+            <div style="max-width:150px;align-self:end"><button class="btn primary" id="sAdd" style="width:100%">Add</button></div>
+          </div><div class="err" id="sErr"></div>
+        </div></div>
+        <div class="panel"><div class="panel-h"><h3>Students</h3><div class="sp"></div><input id="sSearch" placeholder="Search…" style="max-width:220px"></div>
+          <div class="tbl"><table><thead><tr><th>Name</th><th>Class</th><th>Roll</th><th>Fee</th><th>Att%</th><th></th></tr></thead><tbody id="sBody"><tr><td colspan="6" class="muted">Loading…</td></tr></tbody></table></div>
+        </div>`;
+      $("#sAdd").onclick = async ()=>{
+        const err=$("#sErr"); err.classList.remove("show");
+        const body={ name:$("#sName").value.trim(), class_name:$("#sClass").value.trim(), roll_no:$("#sRoll").value||null };
+        if(!body.name||!body.class_name){ err.textContent="Name and class are required."; err.classList.add("show"); return; }
+        try{ await api("/api/students",{method:"POST",body}); $("#sName").value="";$("#sRoll").value=""; toast("Student added"); loadStudents(); }
+        catch(e){ err.textContent=e.message; err.classList.add("show"); }
+      };
+      $("#sSearch").addEventListener("input", ()=>loadStudents($("#sSearch").value));
+      loadStudents();
+      async function loadStudents(q){
+        try{
+          const d = await api("/api/students"+(q?("?search="+encodeURIComponent(q)):""));
+          const rows = (d.data||[]).map(s=>`<tr>
+            <td><b>${esc(s.name)}</b></td><td>${esc(s.class_name)}</td><td>${esc(s.roll_no)}</td>
+            <td><span class="pill ${s.fee_status}">${esc(s.fee_status)}</span></td><td>${esc(s.attendance_pct)}%</td>
+            <td style="text-align:right"><button class="btn sm" data-paid="${s.id}">Mark paid</button> <button class="btn sm danger" data-del="${s.id}">Delete</button></td></tr>`).join("")
+            || `<tr><td colspan="6" class="muted">No students.</td></tr>`;
+          $("#sBody").innerHTML = rows;
+          $("#sBody").querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{ try{ await api("/api/students/"+b.dataset.del,{method:"DELETE"}); toast("Deleted"); loadStudents($("#sSearch").value);}catch(e){toast(e.message);} });
+          $("#sBody").querySelectorAll("[data-paid]").forEach(b=>b.onclick=async()=>{ try{ await api("/api/students/"+b.dataset.paid,{method:"PUT",body:{fee_status:"paid"}}); toast("Updated"); loadStudents($("#sSearch").value);}catch(e){toast(e.message);} });
+        }catch(e){ $("#sBody").innerHTML = `<tr><td colspan="6"><span class="pill no">${esc(e.message)}</span></td></tr>`; }
+      }
+    },
+    async users(){
+      let roles=[];
+      try{ roles = (await api("/api/roles")).roles || []; }catch(e){ return fail(e); }
+      view().innerHTML = `
+        <div class="panel"><div class="panel-h"><h3>Create user &amp; assign role</h3></div><div class="panel-b">
+          <div class="row">
+            <div><label>Name</label><input id="uName"></div>
+            <div><label>Email</label><input id="uEmail" type="email"></div>
+            <div><label>Password</label><input id="uPass" type="password"></div>
+            <div style="max-width:160px"><label>Role</label><select id="uRole">${roles.map(r=>`<option>${esc(r)}</option>`).join("")}</select></div>
+            <div style="max-width:130px;align-self:end"><button class="btn primary" id="uAdd" style="width:100%">Create</button></div>
+          </div><div class="err" id="uErr"></div>
+          <div class="hint">Only school admins can manage users — this is your role-wise access control.</div>
+        </div></div>
+        <div class="panel"><div class="panel-h"><h3>Users</h3></div>
+          <div class="tbl"><table><thead><tr><th>Name</th><th>Email</th><th>Roles</th><th></th></tr></thead><tbody id="uBody"><tr><td colspan="4" class="muted">Loading…</td></tr></tbody></table></div>
+        </div>`;
+      $("#uAdd").onclick = async ()=>{
+        const err=$("#uErr"); err.classList.remove("show");
+        const body={ name:$("#uName").value.trim(), email:$("#uEmail").value.trim(), password:$("#uPass").value, role:$("#uRole").value };
+        try{ await api("/api/users",{method:"POST",body}); $("#uName").value="";$("#uEmail").value="";$("#uPass").value=""; toast("User created"); loadUsers(); }
+        catch(e){ err.textContent=e.message; err.classList.add("show"); }
+      };
+      loadUsers();
+      async function loadUsers(){
+        try{
+          const d = await api("/api/users");
+          $("#uBody").innerHTML = (d.data||[]).map(u=>`<tr><td><b>${esc(u.name)}</b></td><td>${esc(u.email)}</td>
+            <td>${(u.roles||[]).map(r=>`<span class="pill ok">${esc(r)}</span>`).join(" ")}</td>
+            <td style="text-align:right"><button class="btn sm danger" data-del="${u.id}">Delete</button></td></tr>`).join("")
+            || `<tr><td colspan="4" class="muted">No users.</td></tr>`;
+          $("#uBody").querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{ try{ await api("/api/users/"+b.dataset.del,{method:"DELETE"}); toast("Deleted"); loadUsers(); }catch(e){toast(e.message);} });
+        }catch(e){ $("#uBody").innerHTML=`<tr><td colspan="4"><span class="pill no">${esc(e.message)}</span></td></tr>`; }
+      }
+    },
+    async fees(){
+      view().innerHTML = `<div class="panel"><div class="panel-h"><h3>Fee invoices</h3></div>
+        <div class="tbl"><table><thead><tr><th>Invoice</th><th>Student</th><th>Amount</th><th>Status</th><th></th></tr></thead><tbody id="fBody"><tr><td colspan="5" class="muted">Loading…</td></tr></tbody></table></div></div>`;
+      try{
+        const d = await api("/api/fees");
+        $("#fBody").innerHTML = (d.data||[]).map(f=>`<tr><td><b>${esc(f.invoice_no)}</b></td><td>${esc(f.student?f.student.name:'-')}</td>
+          <td>₹${num(f.amount)}</td><td><span class="pill ${f.status}">${esc(f.status)}</span></td>
+          <td style="text-align:right">${f.status!=='paid'?`<button class="btn sm" data-c="${f.id}">Collect</button>`:'✓'}</td></tr>`).join("")
+          || `<tr><td colspan="5" class="muted">No invoices.</td></tr>`;
+        $("#fBody").querySelectorAll("[data-c]").forEach(b=>b.onclick=async()=>{ try{ await api("/api/fees/"+b.dataset.c+"/collect",{method:"POST"}); toast("Payment recorded"); SCHOOL_VIEWS.fees(); }catch(e){toast(e.message);} });
+      }catch(e){ $("#fBody").innerHTML=`<tr><td colspan="5"><span class="pill no">${esc(e.message)}</span></td></tr>`; }
+    },
+    async license(){
+      try{
+        const l = await api("/api/license");
+        view().innerHTML = `<div class="panel"><div class="panel-h"><h3>License</h3></div><div class="panel-b">
+          <table><tbody>
+            <tr><td class="muted">Licensee</td><td><b>${esc(l.licensee||'-')}</b></td></tr>
+            <tr><td class="muted">Key</td><td><span class="key">${esc(l.key||'-')}</span></td></tr>
+            <tr><td class="muted">Status</td><td><span class="pill ${l.status}">${esc(l.status)}</span></td></tr>
+            <tr><td class="muted">Plan</td><td>${esc(l.plan||'-')}</td></tr>
+            <tr><td class="muted">Expires</td><td>${esc(l.expires_at||'—')}</td></tr>
+            <tr><td class="muted">Issued by</td><td>${esc(l.vendor)}</td></tr>
+          </tbody></table>
+          <div class="hint" style="margin-top:12px">Your school runs while this license is active. For changes, contact ${esc(l.vendor)}.</div>
+        </div></div>`;
+      }catch(e){ fail(e); }
+    },
+  };
+
+  async function changePassword(){
+    const cur = prompt("Current password:"); if(cur===null) return;
+    const nw = prompt("New password (min 8 chars):"); if(nw===null) return;
+    try{ await api("/api/change-password",{method:"POST",body:{current_password:cur,new_password:nw,new_password_confirmation:nw}}); toast("Password changed — sign in again."); doLogout(true); }
+    catch(e){ toast(e.message); }
+  }
+
+  // ================= OWNER (CONTROL PLANE) VIEWS =================
+  const OWNER_VIEWS = {
+    async schools(){
+      view().innerHTML = `<div class="panel"><div class="panel-h"><h3>Schools</h3></div>
+        <div class="tbl"><table><thead><tr><th>ID</th><th>Name</th><th>Plan</th><th>License</th><th></th></tr></thead><tbody id="scBody"><tr><td colspan="5" class="muted">Loading…</td></tr></tbody></table></div></div>`;
+      try{
+        const list = await api("/api/central/schools");
+        $("#scBody").innerHTML = (list||[]).map(t=>`<tr><td><span class="key">${esc(t.id)}</span></td><td><b>${esc(t.name)}</b></td><td>${esc(t.plan)}</td>
+          <td><span class="pill ${t.license_status}">${esc(t.license_status)}</span></td>
+          <td style="text-align:right">${t.license_status==='active'?`<button class="btn sm danger" data-sus="${t.id}">Suspend</button>`:`<button class="btn sm" data-act="${t.id}">Activate</button>`}</td></tr>`).join("")
+          || `<tr><td colspan="5" class="muted">No schools yet — provision one.</td></tr>`;
+        $("#scBody").querySelectorAll("[data-sus]").forEach(b=>b.onclick=async()=>{ try{ await api("/api/central/schools/"+b.dataset.sus+"/suspend",{method:"POST"}); toast("Suspended"); OWNER_VIEWS.schools(); }catch(e){toast(e.message);} });
+        $("#scBody").querySelectorAll("[data-act]").forEach(b=>b.onclick=async()=>{ try{ await api("/api/central/schools/"+b.dataset.act+"/activate",{method:"POST"}); toast("Activated"); OWNER_VIEWS.schools(); }catch(e){toast(e.message);} });
+      }catch(e){ $("#scBody").innerHTML=`<tr><td colspan="5"><span class="pill no">${esc(e.message)}</span></td></tr>`; }
+    },
+    async licenses(){
+      view().innerHTML = `<div class="panel"><div class="panel-h"><h3>Licenses</h3></div>
+        <div class="tbl"><table><thead><tr><th>Key</th><th>Licensee</th><th>Plan</th><th>School</th><th>Status</th><th></th></tr></thead><tbody id="liBody"><tr><td colspan="6" class="muted">Loading…</td></tr></tbody></table></div></div>`;
+      try{
+        const d = await api("/api/central/licenses");
+        $("#liBody").innerHTML = (d.data||[]).map(l=>`<tr><td><span class="key">${esc(l.key)}</span></td><td>${esc(l.licensee)}</td><td>${esc(l.plan)}</td>
+          <td>${esc(l.tenant_id||'—')}</td><td><span class="pill ${l.status}">${esc(l.status)}</span></td>
+          <td style="text-align:right">
+            ${l.status==='active'?`<button class="btn sm danger" data-sus="${l.id}">Suspend</button>`:`<button class="btn sm" data-act="${l.id}">Activate</button>`}
+            <button class="btn sm danger" data-rev="${l.id}">Revoke</button></td></tr>`).join("")
+          || `<tr><td colspan="6" class="muted">No licenses — issue one.</td></tr>`;
+        const act=(id,what)=>async()=>{ try{ await api("/api/central/licenses/"+id+"/"+what,{method:"POST"}); toast(what); OWNER_VIEWS.licenses(); }catch(e){toast(e.message);} };
+        $("#liBody").querySelectorAll("[data-sus]").forEach(b=>b.onclick=act(b.dataset.sus,"suspend"));
+        $("#liBody").querySelectorAll("[data-act]").forEach(b=>b.onclick=act(b.dataset.act,"activate"));
+        $("#liBody").querySelectorAll("[data-rev]").forEach(b=>b.onclick=act(b.dataset.rev,"revoke"));
+      }catch(e){ $("#liBody").innerHTML=`<tr><td colspan="6"><span class="pill no">${esc(e.message)}</span></td></tr>`; }
+    },
+    async issue(){
+      view().innerHTML = `<div class="panel" style="max-width:520px"><div class="panel-h"><h3>Issue a license key</h3></div><div class="panel-b">
+        <div class="field"><label>Licensee (customer / school org)</label><input id="liName" placeholder="e.g. Sunrise Academy"></div>
+        <div class="field"><label>Plan</label><select id="liPlan"><option value="starter">Starter</option><option value="pro">Pro</option><option value="enterprise">Enterprise</option></select></div>
+        <div class="field"><label>Expires (optional)</label><input id="liExp" type="date"></div>
+        <div class="err" id="liErr"></div>
+        <button class="btn primary" id="liGo">Generate key</button>
+        <div id="liOut" style="margin-top:14px"></div>
+      </div></div>`;
+      $("#liGo").onclick = async ()=>{
+        const err=$("#liErr"); err.classList.remove("show");
+        const body={ licensee:$("#liName").value.trim(), plan:$("#liPlan").value, expires_at:$("#liExp").value||null };
+        if(!body.licensee){ err.textContent="Enter the licensee name."; err.classList.add("show"); return; }
+        try{ const l = await api("/api/central/licenses",{method:"POST",body});
+          $("#liOut").innerHTML = `<div class="panel-b" style="background:var(--green-wash);border-radius:10px">Key issued: <span class="key">${esc(l.key)}</span><div class="hint" style="margin-top:6px">Give this to the customer, then use “Provision school”.</div></div>`;
+          toast("License issued");
+        }catch(e){ err.textContent=e.message; err.classList.add("show"); }
+      };
+    },
+    async provision(){
+      view().innerHTML = `<div class="panel" style="max-width:560px"><div class="panel-h"><h3>Provision a school</h3></div><div class="panel-b">
+        <div class="row"><div><label>School ID (slug)</label><input id="pId" placeholder="e.g. sunrise"></div><div><label>School name</label><input id="pName" placeholder="Sunrise Academy"></div></div>
+        <div class="field"><label>License key</label><input id="pKey" placeholder="CHEN-XXXX-XXXX-XXXX"></div>
+        <div class="row"><div><label>Admin name</label><input id="pAName"></div><div><label>Admin email</label><input id="pAEmail" type="email"></div></div>
+        <div class="field"><label>Admin password</label><input id="pAPass" type="password" placeholder="min 8 chars"></div>
+        <div class="err" id="pErr"></div>
+        <button class="btn primary" id="pGo">Provision</button>
+      </div></div>`;
+      $("#pGo").onclick = async ()=>{
+        const err=$("#pErr"); err.classList.remove("show");
+        const body={ id:$("#pId").value.trim(), name:$("#pName").value.trim(), license_key:$("#pKey").value.trim(),
+          admin_name:$("#pAName").value.trim(), admin_email:$("#pAEmail").value.trim(), admin_password:$("#pAPass").value };
+        try{ await api("/api/central/schools",{method:"POST",body}); toast("School provisioned"); S.view="schools"; save(); renderApp(); }
+        catch(e){ err.textContent=e.message; err.classList.add("show"); }
+      };
+    },
+  };
+
+  // ---- helpers ----
+  function kpi(cap,val){ return `<div class="kpi"><div class="cap">${esc(cap)}</div><div class="num">${esc(val)}</div></div>`; }
+  function num(n){ return Number(n||0).toLocaleString("en-IN"); }
+
+  // ---- boot ----
+  if(S.token && S.mode) renderApp(); else renderLogin();
+})();
+</script>
+</body>
+</html>

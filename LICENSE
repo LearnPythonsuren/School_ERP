@@ -1,11 +1,70 @@
-Copyright (c) 2026. All rights reserved.
+SCHOLAR ERP — COMMERCIAL SOFTWARE LICENSE
+Copyright (c) 2026 Chenthur Info Tech. All rights reserved.
 
-This software and its source code are proprietary and confidential.
+[TEMPLATE — have this reviewed by a lawyer in your jurisdiction before you
+rely on it. Fill in the bracketed items.]
 
-No part of this software may be copied, modified, distributed, sold, or
-sub-licensed without a written license agreement from the copyright holder.
+1. DEFINITIONS
+   "Software" means Scholar ERP, including its source code, the web
+   application, documentation and updates supplied by Chenthur Info Tech
+   ("Vendor"). "Customer" means the person or organisation that has paid
+   for a license. "School" means one educational institution provisioned
+   under one license key.
 
-If you intend to sell this as source code, replace this file with your
-chosen commercial license terms (for example, a single-domain or extended
-license). If you intend to open-source any part, replace it with an OSI
-license such as MIT or Apache-2.0.
+2. GRANT
+   Subject to payment of the applicable fees, Vendor grants Customer a
+   non-exclusive, non-transferable license to use the Software for the
+   number of Schools and the term stated in Customer's order or invoice.
+   Each School requires its own active license key issued by Vendor.
+
+3. HOSTED SERVICE (SaaS)
+   Where Vendor hosts the Software, Customer receives access only; no copy
+   of the Software is transferred. Access may be suspended for non-payment
+   after [7] days' written notice and is restored on payment.
+
+4. SOURCE-CODE LICENSE (self-hosted editions only)
+   Where Customer receives source code, Customer may install and modify it
+   for its own Schools only. Customer may not resell, sublicense,
+   redistribute, or offer the Software as a service to third parties, and
+   may not remove or circumvent the license-key mechanism or copyright
+   notices.
+
+5. CUSTOMER DATA
+   Data entered by Schools (student, staff, fee and attendance records)
+   belongs to the respective School. Vendor processes it only to provide the
+   service, keeps it confidential, and on termination makes it available for
+   export for [30] days before deletion. Customer is responsible for having a
+   lawful basis to process personal data, including that of minors, under
+   applicable law (e.g. India's Digital Personal Data Protection Act, 2023).
+
+6. SUPPORT AND UPDATES
+   Support and updates are provided for the term and at the level stated in
+   the order. [Response times / channels.]
+
+7. WARRANTY DISCLAIMER
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+   OR IMPLIED, INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+   AND NON-INFRINGEMENT, EXCEPT AS EXPRESSLY STATED IN THE ORDER.
+
+8. LIMITATION OF LIABILITY
+   Vendor's total liability arising from this license is limited to the
+   fees paid by Customer in the [12] months before the claim. Vendor is not
+   liable for indirect, incidental or consequential damages, or lost data
+   or profits.
+
+9. TERMINATION
+   This license ends automatically if Customer breaches it and does not
+   remedy the breach within [15] days of notice. On termination Customer
+   must stop using the Software and, for self-hosted editions, delete all
+   copies.
+
+10. THIRD-PARTY COMPONENTS
+    The Software is built on open-source components (including Laravel,
+    Laravel Sanctum, spatie/laravel-permission and stancl/tenancy, all MIT
+    licensed). Their licenses continue to apply to those components.
+
+11. GOVERNING LAW
+    This license is governed by the laws of India. Courts at [city, state]
+    have exclusive jurisdiction.
+
+Contact: Chenthur Info Tech — [address] — [e-mail] — [phone]

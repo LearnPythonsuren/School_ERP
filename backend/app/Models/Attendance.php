@@ -15,12 +15,8 @@ class Attendance extends Model
         'status',   // present | absent | leave
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'date' => 'date',
-        ];
-    }
+    // `date` is deliberately left uncast: it is stored as a plain Y-m-d
+    // string so the unique (student_id, date) upsert matches on every driver.
 
     public function student(): BelongsTo
     {

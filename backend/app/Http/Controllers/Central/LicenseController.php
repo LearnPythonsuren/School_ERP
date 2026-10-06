@@ -19,7 +19,13 @@ class LicenseController extends Controller
         if ($status = $request->query('status')) {
             $q->where('status', $status);
         }
-        return $q->latest()->paginate($request->integer('per_page', 25));
+        if ($request->boolean('unassigned')) {
+            $q->whereNull('tenant_id');
+        }
+        if ($s = $request->query('search')) {
+            $q->where(fn ($w) => $w->where('key', 'like', "%{$s}%")->orWhere('licensee', 'like', "%{$s}%"));
+        }
+        return $q->latest()->paginate($this->perPage($request));
     }
 
     public function show(License $license)
@@ -33,7 +39,7 @@ class LicenseController extends Controller
         $data = $request->validate([
             'licensee'   => ['required', 'string', 'max:150'],
             'plan'       => ['nullable', 'in:starter,pro,enterprise'],
-            'expires_at' => ['nullable', 'date'],
+            'expires_at' => ['nullable', 'date', 'after:today'],
         ]);
 
         $license = License::create([
@@ -48,16 +54,42 @@ class LicenseController extends Controller
         return response()->json($license, 201);
     }
 
+    /** Renew (new expiry) or change plan / licensee. Mirrors onto the linked school. */
+    public function update(Request $request, License $license)
+    {
+        $data = $request->validate([
+            'licensee'   => ['sometimes', 'string', 'max:150'],
+            'plan'       => ['sometimes', 'in:starter,pro,enterprise'],
+            'expires_at' => ['nullable', 'date'],
+        ]);
+        $license->update($data);
+
+        if ($tenant = $this->tenantOf($license)) {
+            $tenant->update([
+                'plan'               => $license->plan,
+                'licensee'           => $license->licensee,
+                'license_expires_at' => $license->expires_at,
+            ]);
+        }
+
+        return response()->json($license->fresh());
+    }
+
     public function suspend(License $license) { return $this->setStatus($license, 'suspended'); }
-    public function activate(License $license) { return $this->setStatus($license, 'active'); }
-    public function revoke(License $license)   { return $this->setStatus($license, 'revoked'); }
+    public function revoke(License $license)  { return $this->setStatus($license, 'revoked'); }
+
+    public function activate(License $license)
+    {
+        abort_if($license->status === 'revoked', 422, 'A revoked key cannot be re-activated. Issue a new key instead.');
+        return $this->setStatus($license, 'active');
+    }
 
     /** Flip the license status AND mirror it onto the linked school. */
     private function setStatus(License $license, string $status)
     {
         $license->update(['status' => $status]);
 
-        if ($license->tenant_id && $tenant = Tenant::find($license->tenant_id)) {
+        if ($tenant = $this->tenantOf($license)) {
             $tenant->update([
                 'license_status' => $status === 'active' ? 'active' : 'suspended',
                 'is_active'      => $status === 'active',
@@ -65,5 +97,10 @@ class LicenseController extends Controller
         }
 
         return response()->json($license);
+    }
+
+    private function tenantOf(License $license): ?Tenant
+    {
+        return $license->tenant_id ? Tenant::find($license->tenant_id) : null;
     }
 }

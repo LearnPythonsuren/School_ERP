@@ -55,11 +55,11 @@ class TransportController extends Controller
         $data = $request->validate([
             'lat'       => ['required', 'numeric', 'between:-90,90'],
             'lng'       => ['required', 'numeric', 'between:-180,180'],
-            'speed_kph' => ['nullable', 'integer', 'min:0'],
+            'speed_kph' => ['nullable', 'numeric', 'min:0', 'max:200'],
         ]);
         $vehicle->update([
             'lat' => $data['lat'], 'lng' => $data['lng'],
-            'speed_kph' => $data['speed_kph'] ?? 0, 'status' => 'on_route', 'last_ping' => now(),
+            'speed_kph' => (int) round($data['speed_kph'] ?? 0), 'status' => 'on_route', 'last_ping' => now(),
         ]);
         return response()->json($vehicle);
     }

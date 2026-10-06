@@ -20,87 +20,32 @@ jobs:
             php -l "$f" | grep -q "No syntax errors" || { echo "FAIL $f"; fail=1; }
           done
           [ "$fail" = "0" ] && echo "All backend PHP files pass."; exit $fail
-      - name: JS syntax check
+      - name: JS syntax check (both frontends)
         run: |
-          test -f frontend/index.html || { echo "frontend/index.html missing"; exit 1; }
-          node -e "const fs=require('fs');const h=fs.readFileSync('frontend/index.html','utf8');const m=h.match(/<script>([\s\S]*)<\/script>/);if(!m)process.exit(0);fs.writeFileSync('/tmp/app.js',m[1]);"
-          node --check /tmp/app.js && echo "Frontend JS OK"
+          for f in frontend/index.html frontend/app.html; do
+            node -e "const fs=require('fs');const h=fs.readFileSync('$f','utf8');const m=[...h.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(x=>x[1]).join('\n');fs.writeFileSync('/tmp/app.js',m);"
+            node --check /tmp/app.js && echo "$f JS OK"
+          done
 
   integration:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: { path: repo }
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: mbstring, xml, curl, sqlite3, pdo_sqlite, bcmath
-      - name: Create fresh Laravel app
-        run: composer create-project laravel/laravel app --no-interaction --quiet
-      - name: Packages + scaffolding
-        working-directory: app
+          extensions: mbstring, xml, curl, sqlite3, pdo_sqlite, bcmath, intl
+          tools: composer
+      - name: Install (same script customers run)
+        run: SCHOLAR_APP_DIR="$RUNNER_TEMP/app" bash setup.sh
+      - name: API tests (control plane, every module, roles, live license gate)
         run: |
-          php artisan install:api --no-interaction
-          composer require spatie/laravel-permission stancl/tenancy --no-interaction --quiet
-          php artisan tenancy:install --no-interaction
-          php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --no-interaction
-          php -r '$f="bootstrap/providers.php";$c=file_get_contents($f);if(strpos($c,"TenancyServiceProvider")===false){$c=preg_replace("/return \[\s*/","return [\n    App\\\\Providers\\\\TenancyServiceProvider::class,\n    ",$c,1);file_put_contents($f,$c);}'
-      - name: Overlay product code
-        run: |
-          cp -r repo/backend/app/* app/app/
-          cp -r repo/backend/database/migrations/* app/database/migrations/
-          cp -r repo/backend/database/seeders/* app/database/seeders/
-          cp repo/backend/routes/api.php app/routes/api.php
-      - name: Configure (SQLite, per-school tables, keep central token table)
-        working-directory: app
-        run: |
-          sed -i "s#'tenant_model' => .*#'tenant_model' => \\\\App\\\\Models\\\\Tenant::class,#" config/tenancy.php
-          mv database/migrations/0001_01_01_000000_create_users_table.php database/migrations/tenant/
-          for f in database/migrations/*personal_access_tokens*; do
-            [ "$(basename "$f")" = "2024_01_01_000210_create_personal_access_tokens_table.php" ] || mv "$f" database/migrations/tenant/
-          done
-          mv database/migrations/*permission* database/migrations/tenant/
-          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=sqlite/' .env
-          sed -i '/^DB_HOST=/d;/^DB_PORT=/d;/^DB_DATABASE=/d;/^DB_USERNAME=/d;/^DB_PASSWORD=/d' .env
-          sed -i 's/^CACHE_STORE=.*/CACHE_STORE=array/;s/^SESSION_DRIVER=.*/SESSION_DRIVER=array/;s/^QUEUE_CONNECTION=.*/QUEUE_CONNECTION=sync/' .env
-          touch database/database.sqlite
-          php artisan key:generate
-          php artisan config:clear
-      - name: Migrate + seed owner + licensed demo school
-        working-directory: app
-        run: |
-          php artisan migrate --force
-          php artisan db:seed --class=CentralAdminSeeder --force
-          php artisan tinker --execute="\$t=App\Models\Tenant::create(['id'=>'greenfield','name'=>'Greenfield','licensee'=>'Greenfield','license_status'=>'active']); \$t->domains()->create(['domain'=>'greenfield.localhost']);"
-          php artisan tenants:seed --class=RoleSeeder --force
-          php artisan tenants:seed --class=DemoDataSeeder --force
-          php artisan tinker --execute="App\Models\Tenant::find('greenfield')->run(function(){ \$u=App\Models\User::create(['name'=>'Admin','email'=>'admin@greenfield.test','password'=>bcrypt('password123')]); \$u->assignRole('admin'); });"
-      - name: API tests (control plane + school CRUD + license gate)
-        working-directory: app
-        run: |
+          cd "$RUNNER_TEMP/app"
           php artisan serve --host=127.0.0.1 --port=8000 </dev/null >/tmp/serve.log 2>&1 &
-          sleep 6
-          B=http://127.0.0.1:8000
-          fail(){ echo "FAIL: $1"; cat /tmp/serve.log; exit 1; }
-
-          # control plane
-          CT=$(curl -s -X POST "$B/api/central/login" -H "Accept: application/json" -H "Content-Type: application/json" -d '{"email":"owner@chenthur.tech","password":"ChangeMe123!"}' | php -r '$d=json_decode(stream_get_contents(STDIN),true);echo $d["token"]??"";')
-          [ -n "$CT" ] && echo "owner-login: PASS" || fail "owner login"
-          curl -s "$B/api/central/schools" -H "Accept: application/json" -H "Authorization: Bearer $CT" | grep -q greenfield && echo "list-schools: PASS" || fail "list schools"
-
-          # school login (license active)
-          TT=$(curl -s -X POST "$B/api/login" -H "Accept: application/json" -H "X-Tenant: greenfield" -H "Content-Type: application/json" -d '{"email":"admin@greenfield.test","password":"password123"}' | php -r '$d=json_decode(stream_get_contents(STDIN),true);echo $d["token"]??"";')
-          [ -n "$TT" ] && echo "school-login: PASS" || fail "school login"
-          curl -s "$B/api/dashboard" -H "Accept: application/json" -H "X-Tenant: greenfield" -H "Authorization: Bearer $TT" | grep -q '"total_students":8' && echo "dashboard: PASS" || fail "dashboard"
-          curl -s "$B/api/license" -H "Accept: application/json" -H "X-Tenant: greenfield" -H "Authorization: Bearer $TT" | grep -q '"status":"active"' && echo "license: PASS" || fail "license"
-
-          # student CRUD
-          R=$(curl -s -X POST "$B/api/students" -H "Accept: application/json" -H "X-Tenant: greenfield" -H "Content-Type: application/json" -H "Authorization: Bearer $TT" -d '{"name":"CI Kid","class_name":"Class 6-A","roll_no":99}')
-          echo "$R" | grep -q "CI Kid" && echo "student-create: PASS" || fail "student create"
-          SID=$(echo "$R" | php -r '$d=json_decode(stream_get_contents(STDIN),true);echo $d["data"]["id"]??($d["id"]??"");')
-          curl -s -X PUT "$B/api/students/$SID" -H "Accept: application/json" -H "X-Tenant: greenfield" -H "Content-Type: application/json" -H "Authorization: Bearer $TT" -d '{"fee_status":"paid"}' | grep -q paid && echo "student-update: PASS" || fail "student update"
-          [ "$(curl -s -o /dev/null -w '%{http_code}' -X DELETE "$B/api/students/$SID" -H "Accept: application/json" -H "X-Tenant: greenfield" -H "Authorization: Bearer $TT")" = "204" ] && echo "student-delete: PASS" || fail "student delete"
-
-          # auth guard
-          [ "$(curl -s -o /dev/null -w '%{http_code}' "$B/api/dashboard" -H "Accept: application/json" -H "X-Tenant: greenfield")" = "401" ] && echo "auth-guard: PASS" || fail "auth guard"
-          echo "ALL CI CHECKS PASSED"
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:8000/api/health >/dev/null && break; sleep 1; done
+          cd "$GITHUB_WORKSPACE"
+          bash test-api.sh || { cat /tmp/serve.log; tail -n 80 "$RUNNER_TEMP/app/storage/logs/laravel.log" 2>/dev/null; exit 1; }
+      - name: Upgrade path (setup.sh --update keeps data)
+        run: |
+          SCHOLAR_APP_DIR="$RUNNER_TEMP/app" bash setup.sh --update
+          cd "$RUNNER_TEMP/app" && php artisan tinker --execute="echo App\Models\Tenant::count();" | grep -q '[1-9]'

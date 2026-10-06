@@ -1,0 +1,4 @@
+# Shell scripts must keep LF endings or bash fails on Linux servers,
+# even when the repo is checked out (or zipped) on Windows.
+*.sh  text eol=lf
+*.yml text eol=lf

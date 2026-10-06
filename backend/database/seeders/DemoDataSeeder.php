@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Admission;
 use App\Models\Announcement;
+use App\Models\Attendance;
 use App\Models\Book;
 use App\Models\ExamResult;
 use App\Models\FeeInvoice;
@@ -12,8 +13,11 @@ use App\Models\Setting;
 use App\Models\StaffMember;
 use App\Models\Student;
 use App\Models\TimetableSlot;
+use App\Models\User;
 use App\Models\Vehicle;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 /**
  * Seeds one school with the same demo data the live prototype uses, so a
@@ -39,11 +43,11 @@ class DemoDataSeeder extends Seeder
         }
 
         $fees = [
-            ['invoice_no' => 'INV-2401', 'student_id' => 1, 'class_name' => 'Class 10-A', 'amount' => 24500, 'status' => 'paid',    'paid_on' => '2025-09-12'],
-            ['invoice_no' => 'INV-2402', 'student_id' => 2, 'class_name' => 'Class 9-C',  'amount' => 21000, 'status' => 'due'],
-            ['invoice_no' => 'INV-2403', 'student_id' => 4, 'class_name' => 'Class 10-A', 'amount' => 24500, 'status' => 'partial', 'paid_on' => '2025-09-08'],
-            ['invoice_no' => 'INV-2404', 'student_id' => 6, 'class_name' => 'Class 9-C',  'amount' => 21000, 'status' => 'paid',    'paid_on' => '2025-09-14'],
-            ['invoice_no' => 'INV-2405', 'student_id' => 7, 'class_name' => 'Class 6-A',  'amount' => 18000, 'status' => 'due'],
+            ['invoice_no' => 'INV-2401', 'student_id' => 1, 'class_name' => 'Class 10-A', 'description' => 'Term 1 tuition', 'amount' => 24500, 'paid_amount' => 24500, 'status' => 'paid',    'paid_on' => '2025-09-12', 'payment_mode' => 'upi',  'receipt_no' => 'RCPT-0001'],
+            ['invoice_no' => 'INV-2402', 'student_id' => 2, 'class_name' => 'Class 9-C',  'description' => 'Term 1 tuition', 'amount' => 21000, 'paid_amount' => 0,     'status' => 'due',     'due_on' => '2025-10-15'],
+            ['invoice_no' => 'INV-2403', 'student_id' => 4, 'class_name' => 'Class 10-A', 'description' => 'Term 1 tuition', 'amount' => 24500, 'paid_amount' => 12000, 'status' => 'partial', 'paid_on' => '2025-09-08', 'payment_mode' => 'cash', 'receipt_no' => 'RCPT-0002'],
+            ['invoice_no' => 'INV-2404', 'student_id' => 6, 'class_name' => 'Class 9-C',  'description' => 'Term 1 tuition', 'amount' => 21000, 'paid_amount' => 21000, 'status' => 'paid',    'paid_on' => '2025-09-14', 'payment_mode' => 'bank', 'receipt_no' => 'RCPT-0003'],
+            ['invoice_no' => 'INV-2405', 'student_id' => 7, 'class_name' => 'Class 6-A',  'description' => 'Term 1 tuition', 'amount' => 18000, 'paid_amount' => 0,     'status' => 'due',     'due_on' => '2025-10-15'],
         ];
         foreach ($fees as $f) {
             FeeInvoice::create($f);
@@ -137,11 +141,44 @@ class DemoDataSeeder extends Seeder
             'school_name'   => 'Greenfield Public School',
             'academic_year' => '2025-26',
             'currency'      => 'INR',
+            'timezone'      => 'Asia/Kolkata',
             'plan'          => 'pro',
             'branch'        => 'Main',
+            'address'       => '12 Gandhi Road, Karur, Tamil Nadu 639001',
+            'phone'         => '+91 4324 000000',
+            'email'         => 'office@greenfield.test',
         ];
         foreach ($settings as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+        }
+
+        // A week of attendance so the dashboard trend and reports have data.
+        $pattern = ['present', 'present', 'present', 'absent', 'present', 'leave', 'present', 'present'];
+        for ($d = 7; $d >= 1; $d--) {
+            $date = now()->subDays($d);
+            if ($date->isSunday()) {
+                continue;
+            }
+            foreach (Student::orderBy('id')->get() as $i => $student) {
+                Attendance::create([
+                    'student_id' => $student->id,
+                    'date'       => $date->toDateString(),
+                    'status'     => $pattern[($i + $d) % count($pattern)],
+                ]);
+            }
+        }
+        Student::all()->each->refreshAttendancePct();
+
+        // One demo login per staff role (password: password123) so every
+        // role-based screen can be shown. Requires RoleSeeder to have run.
+        if (Role::where('name', 'teacher')->exists()) {
+            foreach (['teacher' => 'Priya Verma', 'accountant' => 'Rakesh Iyer', 'driver' => 'Mani P.', 'parent' => 'Sanjay Kapoor'] as $role => $name) {
+                $user = User::firstOrCreate(
+                    ['email' => $role.'@greenfield.test'],
+                    ['name' => $name, 'password' => Hash::make('password123')],
+                );
+                $user->syncRoles([$role]);
+            }
         }
     }
 }

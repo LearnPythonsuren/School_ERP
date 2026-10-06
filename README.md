@@ -1,77 +1,132 @@
 # Scholar ERP
 
 A multi-tenant school-management platform by **Chenthur Info Tech**. One
-codebase serves unlimited schools, each with its own isolated database, and
-each running only on a license key the vendor issues.
+installation serves any number of schools. Each school gets its own isolated
+database and runs only while it holds a license key that you issue.
 
 ```
-Web dashboard / Flutter apps  --->  Laravel API  --->  one database per school
-      (frontend/)                    (backend/)         (isolated per tenant)
-                                         ^
-                          Central control plane (you / Chenthur Info Tech):
-                          issue license keys - provision & suspend schools
+ Browser / phone ──► Laravel API ──► one database per school
+   (app.html)          (backend/)       (fully isolated)
+                           ▲
+           Owner console (Chenthur Info Tech):
+           issue & renew licenses · provision · suspend schools
+```
+
+Current version: **1.1.0** (see [CHANGELOG.md](CHANGELOG.md)).
+
+## What's included
+
+| Module | What schools can do |
+|---|---|
+| Dashboard | Live KPIs, 7-day attendance trend, pending work, quick actions |
+| Students | Records, guardians, class filters, fee & attendance status, CSV export |
+| Admissions | Applications → approve / reject → enroll as a student in one click |
+| Staff & HR | Staff directory, departments, daily status |
+| Attendance | Class register (P / A / L), mark-all, automatic attendance % |
+| Exams & Results | Marks entry, automatic grading, per-exam and per-class views |
+| Timetable | Weekly grid per class, click a cell to edit |
+| Fee Collection | Invoices, whole-class invoicing, partial payments, payment modes, printable receipts |
+| Library | Catalogue, issue / return, overdue tracking |
+| Transport | Bus fleet, live GPS from the driver's phone, map view |
+| Hostel | Rooms, beds, allot / vacate, occupancy |
+| Announcements | Drafts, send to parents / staff / everyone, in-app feed |
+| Reports | Collection by class, attendance, grades, admissions, Excel-ready CSV downloads |
+| Users & Roles | Accounts with role-based access (below) |
+| Settings | School profile (shown on receipts), currency, time zone, license status |
+
+## Roles
+
+| Role | Can use |
+|---|---|
+| **admin** | Everything in their school |
+| **accountant** | Fees, receipts, reports, student list |
+| **teacher** | Attendance, exams, library, students & staff (read), announcements |
+| **driver** | Their bus and live location sharing |
+| **parent / student** | Timetable and announcements |
+
+Access is enforced by the API on every request, not just hidden in the UI.
+
+The **owner** (you) signs in to the separate owner console to issue license
+keys (`CHEN-XXXX-XXXX-XXXX`), provision schools, renew, suspend or revoke.
+Suspending a school or its key locks out its users immediately, including
+anyone already signed in.
+
+## Try it locally (about 5 minutes)
+
+Needs PHP 8.2+ (with `pdo_sqlite`, `mbstring`, `openssl`, `curl`) and Composer.
+
+```bash
+bash setup.sh
+```
+
+```bash
+cd ../scholar-app && php artisan serve
+```
+
+Open **http://127.0.0.1:8000**. The demo school ID is `greenfield`; every
+demo password is `password123`:
+
+| Login | Role |
+|---|---|
+| `admin@greenfield.test` | admin |
+| `accountant@greenfield.test` | accountant |
+| `teacher@greenfield.test` | teacher |
+| `driver@greenfield.test` | driver |
+| `parent@greenfield.test` | parent |
+| `owner@chenthur.tech` / `ChangeMe123!` | owner console (switch tab on the login screen) |
+
+When the server is local, the login screen shows one-click demo buttons.
+
+Run the 69 end-to-end API checks (with the server running):
+
+```bash
+bash test-api.sh
 ```
 
 ## Repository layout
 
 | Path | What it is |
-|------|------------|
-| `frontend/index.html` | Offline demo dashboard — all 13 modules, click-around, no server needed. |
-| `frontend/app.html` | **Live client** — school login **and** owner control-plane login, wired to the API. |
-| `backend/`  | Laravel 12 multi-tenant REST API (Sanctum auth, Spatie roles, licensing). Setup in `backend/README.md`. |
-| `docs/`     | `HOSTING.md` - push-to-GitHub + deployment guide. |
-| `setup.sh`  | One command that builds a runnable backend from `backend/`. |
-| `test-api.sh` | Runs the control-plane + CRUD + license checks against a running server. |
-| `.github/workflows/ci.yml` | CI: builds and tests the whole thing on every push. |
+|---|---|
+| `frontend/app.html` | The web app (school portal + owner console). `setup.sh` installs it into Laravel's `public/`. |
+| `frontend/index.html` | Offline sales demo: click through every module with no server. |
+| `backend/` | Product code overlaid onto a fresh Laravel app (models, controllers, middleware, migrations, seeders, routes). API reference in [backend/README.md](backend/README.md). |
+| `setup.sh` | Fresh install (`bash setup.sh`) or in-place upgrade (`bash setup.sh --update`). |
+| `test-api.sh` | End-to-end API test suite. |
+| `docs/DEPLOYMENT.md` | Putting it on a real server (VPS, MySQL, HTTPS, backups, updates). |
+| `.github/workflows/ci.yml` | CI runs `setup.sh`, the full test suite and the upgrade path on every push. |
 
-## Modules (all with full CRUD)
+## Going live
 
-Students - Fees - Staff - Exams - Attendance - Admissions - Timetable -
-Library - Transport (GPS) - Hostel - Communication - Reports - Settings,
-plus **User management** with role assignment.
+Follow [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). Before the first customer:
 
-## Two levels of access
+1. Set `CENTRAL_ADMIN_EMAIL` / `CENTRAL_ADMIN_PASSWORD` **before** seeding,
+   or change the owner password from the console straight after.
+2. `APP_ENV=production`, `APP_DEBUG=false`, HTTPS only.
+3. Remove the `greenfield` demo school, or don't run the demo seeder.
+4. Have a lawyer review `LICENSE` (it's a template).
 
-- **Super Admin (Chenthur Info Tech - the product owner).** Central control
-  plane: issue license keys (`CHEN-XXXX-XXXX-XXXX`), provision schools,
-  suspend/re-activate any school. Default: `owner@chenthur.tech` /
-  `ChangeMe123!` (change via `CENTRAL_ADMIN_EMAIL` / `CENTRAL_ADMIN_PASSWORD`).
-- **School Admin (per school).** Manages their own users and role-wise access
-  (admin / teacher / student / parent). A school only works while its license
-  is active.
-
-## Quick start
-
-**Frontend** (no build):
+## Upgrading an existing install
 
 ```bash
-open frontend/index.html      # or: npx serve frontend
+git pull
+SCHOLAR_APP_DIR=/path/to/scholar-app bash setup.sh --update
 ```
 
-**Backend** (needs PHP 8.2+ and Composer):
+This copies the new code, migrates the central database and every school
+database, and adds any new roles. Data is kept.
 
-```bash
-bash setup.sh                 # builds ../scholar-app, migrates, seeds a licensed demo school
-cd ../scholar-app && php artisan serve
-# in a second terminal, from the repo:
-bash test-api.sh
-```
+## Known limits (good next steps)
 
-Logins after setup:
-- School admin: `admin@greenfield.test` / `password123` (header `X-Tenant: greenfield`)
-- Owner control plane: `owner@chenthur.tech` / `ChangeMe123!` (no `X-Tenant`)
-
-## Deploy
-
-See `docs/HOSTING.md`. Backend -> Laravel Cloud / Forge / Railway / Render;
-frontend -> Netlify / Vercel / Cloudflare Pages / GitHub Pages.
+- **SMS / e-mail / push delivery:** announcements are delivered in-app and
+  recipients are counted. Plug a gateway (MSG91, Twilio, FCM, SMTP) into
+  `CommunicationController::send` to deliver them externally.
+- **Online fee payment:** payments are recorded by staff. A Razorpay or
+  Stripe checkout can call the existing `POST /api/fees/{id}/collect`.
+- **Parent ↔ child linking:** parent accounts see school-wide timetable and
+  announcements, not a per-child view yet.
+- **Mobile apps:** the web app is mobile-friendly. Native Flutter apps can
+  use the same API.
 
 ## License
 
-Proprietary (c) Chenthur Info Tech. See `LICENSE`.
-
-## Using the live client (`frontend/app.html`)
-
-Open `frontend/app.html`, enter your API URL (e.g. `http://127.0.0.1:8000`), then:
-- **School login** — School ID + email + password (e.g. `greenfield` / `admin@greenfield.test` / `password123`). Gives the school dashboard, students, users & roles, fees, and license status — all live.
-- **Owner (control plane)** — `owner@chenthur.tech` / `ChangeMe123!`. Issue license keys, provision schools, and suspend/activate any school.
+Proprietary © Chenthur Info Tech. See [LICENSE](LICENSE).

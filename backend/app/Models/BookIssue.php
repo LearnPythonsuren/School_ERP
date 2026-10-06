@@ -14,9 +14,9 @@ class BookIssue extends Model
     protected function casts(): array
     {
         return [
-            'issued_on'   => 'date',
-            'due_on'      => 'date',
-            'returned_on' => 'date',
+            'issued_on'   => 'date:Y-m-d',
+            'due_on'      => 'date:Y-m-d',
+            'returned_on' => 'date:Y-m-d',
         ];
     }
 

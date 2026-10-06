@@ -8,12 +8,12 @@ use Illuminate\Http\Request;
 
 class TimetableController extends Controller
 {
-    /** Grid for one class: GET /api/timetable?class=Class 10-A */
+    /** Grid for one class: GET /api/timetable?class=Class 10-A (defaults to the first class). */
     public function index(Request $request)
     {
-        $class = $request->query('class');
-        abort_unless($class, 422, 'A class query parameter is required.');
-        $slots = TimetableSlot::where('class_name', $class)->orderBy('period_no')->get();
+        $classes = TimetableSlot::distinct()->orderBy('class_name')->pluck('class_name');
+        $class = $request->query('class') ?: $classes->first();
+        $slots = $class ? TimetableSlot::where('class_name', $class)->orderBy('period_no')->get() : collect();
         $grid = [];
         foreach ($slots as $s) {
             $grid[$s->day][$s->period_no] = [
@@ -21,7 +21,7 @@ class TimetableController extends Controller
                 'start_time' => $s->start_time, 'end_time' => $s->end_time,
             ];
         }
-        return response()->json(['class' => $class, 'grid' => $grid, 'slots' => $slots]);
+        return response()->json(['class' => $class, 'classes' => $classes, 'grid' => $grid, 'slots' => $slots]);
     }
 
     /** Create or overwrite one slot (idempotent on class + day + period). */

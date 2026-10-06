@@ -32,7 +32,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
 
     public function licenseIsActive(): bool
     {
-        if ($this->license_status !== 'active') {
+        if ($this->license_status !== 'active' || ! $this->is_active) {
             return false;
         }
         if ($this->license_expires_at && now()->greaterThan($this->license_expires_at)) {

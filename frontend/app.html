@@ -3,425 +3,1275 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Scholar ERP — Live</title>
+<meta name="color-scheme" content="light dark">
+<title>Scholar ERP</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#F5F6FA;--surface:#fff;--surface-2:#FBFBFE;--line:#E7E9F1;
+    --bg:#F5F6FA;--surface:#fff;--surface-2:#F8F9FC;--line:#E7E9F1;
     --ink:#171A2B;--ink-2:#5A5F76;--ink-3:#8A8FA6;
     --primary:#2B4EE6;--primary-ink:#1B34AE;--primary-wash:#EDF0FE;
-    --accent:#F59E0B;--green:#0FA968;--green-wash:#E6F7EF;--red:#E5484D;--red-wash:#FCEEEE;
+    --green:#0FA968;--green-wash:#E6F7EF;--red:#E5484D;--red-wash:#FCEEEE;--amber:#B8770B;--amber-wash:#FEF3E2;
     --radius:14px;--shadow:0 1px 2px rgba(23,26,43,.05),0 10px 30px rgba(23,26,43,.07);
     --font:"Plus Jakarta Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
   }
   @media (prefers-color-scheme:dark){:root{
     --bg:#0D0F1A;--surface:#161927;--surface-2:#1B1F30;--line:#272B3D;
     --ink:#EDEEF5;--ink-2:#A6ABC2;--ink-3:#71768F;--primary:#6E88F6;--primary-ink:#AEBEFB;--primary-wash:#1E2440;
-    --green:#3ECf8E;--green-wash:#12321F;--red:#F16A6E;--red-wash:#3A1D1E;}}
+    --green:#3ECF8E;--green-wash:#12321F;--red:#F16A6E;--red-wash:#3A1D1E;--amber:#F0B44C;--amber-wash:#3A2C12;}}
   *{box-sizing:border-box}html,body{height:100%}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;-webkit-font-smoothing:antialiased}
-  h1,h2,h3{margin:0;letter-spacing:-.02em}
+  h1,h2,h3,h4{margin:0;letter-spacing:-.02em}
   a{color:var(--primary)}
   :focus-visible{outline:3px solid var(--primary);outline-offset:2px;border-radius:6px}
   button{font-family:inherit;cursor:pointer}
-  input,select{font-family:inherit;width:100%;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:14px}
+  input,select,textarea{font-family:inherit;width:100%;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:14px}
+  textarea{min-height:110px;resize:vertical}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-wash)}
   label{display:block;font-size:13px;font-weight:600;color:var(--ink-2);margin:0 0 6px}
-  .field{margin-bottom:14px}
-  .btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 16px;font-weight:600;font-size:14px;display:inline-flex;gap:7px;align-items:center;justify-content:center}
-  .btn:hover{background:var(--surface-2)}
-  .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
-  .btn.primary:hover{background:var(--primary-ink)}
-  .btn.sm{padding:5px 12px;font-size:13px}
-  .btn.danger{color:var(--red);border-color:var(--red-wash)}
-  .err{background:var(--red-wash);color:var(--red);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;margin-bottom:12px;display:none}
-  .err.show{display:block}
+  .field{margin-bottom:14px}.field .ferr{color:var(--red);font-size:12px;margin-top:5px;display:none}.field.bad .ferr{display:block}.field.bad input,.field.bad select,.field.bad textarea{border-color:var(--red)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 14px;font-weight:700;font-size:14px;white-space:nowrap}
+  .btn:hover{background:var(--surface-2)}.btn:disabled{opacity:.55;cursor:default}
+  .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}.btn.primary:hover{background:var(--primary-ink)}
+  .btn.danger{color:var(--red)}.btn.danger.solid{background:var(--red);border-color:var(--red);color:#fff}
+  .btn.sm{padding:5px 10px;font-size:12.5px;border-radius:8px}
+  .btn.ghost{border-color:transparent;background:none}
+  .err{display:none;background:var(--red-wash);color:var(--red);border-radius:10px;padding:10px 12px;font-size:13.5px;font-weight:600;margin-bottom:14px}.err.show{display:block}
+  .note{background:var(--amber-wash);color:var(--amber);border-radius:10px;padding:10px 12px;font-size:13.5px;font-weight:600;margin-bottom:16px}
+  .muted{color:var(--ink-3)}.small{font-size:12.5px}.right{text-align:right}.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
 
   /* Login */
-  .login-wrap{min-height:100%;display:grid;place-items:center;padding:20px}
-  .login{background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);width:100%;max-width:420px;overflow:hidden}
-  .login-head{padding:24px 24px 8px;text-align:center}
-  .brandmark{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--primary),#5B72F0);color:#fff;display:grid;place-items:center;font-weight:800;font-size:22px;margin:0 auto 12px}
-  .login-head h1{font-size:20px;font-weight:800}
-  .login-head p{color:var(--ink-3);font-size:13px;margin:4px 0 0}
+  .login-wrap{min-height:100vh;display:grid;place-items:center;padding:20px}
+  .login{background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);width:100%;max-width:430px;overflow:hidden}
+  .login-head{padding:26px 24px 6px;text-align:center}
+  .brandmark{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,var(--primary),#5B72F0);color:#fff;display:grid;place-items:center;font-weight:800;font-size:22px;margin:0 auto 12px}
+  .login-head h1{font-size:21px;font-weight:800}.login-head p{color:var(--ink-3);font-size:13px;margin:4px 0 0}
   .tabs{display:flex;gap:6px;padding:16px 24px 0}
   .tabs button{flex:1;border:1px solid var(--line);background:var(--surface-2);color:var(--ink-2);border-radius:10px;padding:9px;font-weight:700;font-size:13px}
   .tabs button.on{background:var(--primary-wash);color:var(--primary-ink);border-color:var(--primary-wash)}
-  .login-body{padding:16px 24px 24px}
-  .hint{font-size:11.5px;color:var(--ink-3);margin-top:-6px;margin-bottom:12px}
+  .login-body{padding:16px 24px 22px}
+  .hint{font-size:11.5px;color:var(--ink-3);margin-top:5px}
+  details.srv summary{font-size:12.5px;color:var(--ink-3);cursor:pointer;margin-bottom:10px}
+  .demo{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+  .demo button{border:0;background:var(--surface-2);color:var(--ink-2);border-radius:8px;padding:5px 9px;font-size:12px;font-weight:600;margin:0 4px 6px 0}
 
   /* Shell */
-  .shell{display:grid;grid-template-columns:230px 1fr;min-height:100%}
-  .sidebar{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+  .shell{display:grid;grid-template-columns:240px 1fr;min-height:100%}
+  .sidebar{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:30}
   .brand{display:flex;align-items:center;gap:10px;padding:18px 18px 8px}
-  .brand .m{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--primary),#5B72F0);color:#fff;display:grid;place-items:center;font-weight:800}
-  .brand b{font-size:15px;font-weight:800}.brand small{display:block;color:var(--ink-3);font-size:11px}
-  .who{margin:6px 14px 8px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);font-size:12px}
-  .who b{font-size:13px}.who span{color:var(--ink-3)}
-  .nav{padding:6px 12px;flex:1;overflow:auto}
-  .nav button{display:flex;gap:10px;align-items:center;width:100%;border:0;background:none;color:var(--ink-2);padding:9px 12px;border-radius:10px;font-weight:600;font-size:14px;text-align:left;margin-bottom:1px}
+  .brand .m{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--primary),#5B72F0);color:#fff;display:grid;place-items:center;font-weight:800;flex:none}
+  .brand b{font-size:15px;font-weight:800;display:block;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.brand small{display:block;color:var(--ink-3);font-size:11px}
+  .nav{padding:4px 12px 12px;flex:1;overflow:auto}
+  .nav .grp{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding:14px 12px 6px}
+  .nav button{display:flex;gap:10px;align-items:center;width:100%;border:0;background:none;color:var(--ink-2);padding:8px 12px;border-radius:10px;font-weight:600;font-size:14px;text-align:left;margin-bottom:1px}
+  .nav button svg{width:18px;height:18px;flex:none}
   .nav button:hover{background:var(--surface-2);color:var(--ink)}
   .nav button.on{background:var(--primary-wash);color:var(--primary-ink)}
-  .nav .sp{flex:1}
-  .foot{padding:12px}
   .main{min-width:0;display:flex;flex-direction:column}
-  .top{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding:14px 22px;display:flex;align-items:center;gap:12px;z-index:5}
-  .top h2{font-size:18px;font-weight:800}
-  .top .sp{flex:1}
-  .content{padding:22px;max-width:1100px;width:100%}
+  .top{position:sticky;top:0;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 22px;display:flex;align-items:center;gap:12px;z-index:20}
+  .top h2{font-size:18px;font-weight:800}.top .sp{flex:1}
+  .menu-btn{display:none}
+  .acct{position:relative}
+  .acct-btn{display:flex;align-items:center;gap:9px;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:5px 10px 5px 5px;color:var(--ink)}
+  .avatar{width:30px;height:30px;border-radius:9px;background:var(--primary-wash);color:var(--primary-ink);display:grid;place-items:center;font-weight:800;font-size:13px}
+  .acct-btn .who{text-align:left;line-height:1.2}.acct-btn .who b{font-size:13px;display:block}.acct-btn .who span{font-size:11px;color:var(--ink-3)}
+  .dropdown{position:absolute;right:0;top:calc(100% + 6px);background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);min-width:210px;padding:6px;display:none}
+  .dropdown.open{display:block}
+  .dropdown button{display:block;width:100%;text-align:left;border:0;background:none;color:var(--ink);padding:9px 11px;border-radius:8px;font-size:14px;font-weight:600}
+  .dropdown button:hover{background:var(--surface-2)}
+  .content{padding:22px;max-width:1240px;width:100%}
+  .scrim{display:none}
+
+  /* Building blocks */
+  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+  .toolbar input,.toolbar select{width:auto;min-width:150px}
+  .toolbar input[type=search]{min-width:220px}
+  .toolbar .sp{flex:1}
+  .seg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+  .seg button{border:0;background:none;color:var(--ink-2);padding:6px 11px;border-radius:7px;font-weight:700;font-size:13px}
+  .seg button.on{background:var(--primary-wash);color:var(--primary-ink)}
   .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:18px}
   .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
   .kpi .cap{color:var(--ink-2);font-size:13px;font-weight:600}
-  .kpi .num{font-size:26px;font-weight:800;margin-top:8px;font-variant-numeric:tabular-nums}
+  .kpi .num{font-size:25px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums}
+  .kpi .sub{color:var(--ink-3);font-size:12px;margin-top:3px}
   .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:18px}
-  .panel-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+  .panel-h{padding:13px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .panel-h h3{font-size:15px;font-weight:700}.panel-h .sp{flex:1}
   .panel-b{padding:16px 18px}
   table{width:100%;border-collapse:collapse}
   .tbl{overflow-x:auto}
-  th{text-align:left;font-size:12px;color:var(--ink-2);font-weight:700;padding:11px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
-  td{padding:11px 14px;border-bottom:1px solid var(--line);font-size:14px;white-space:nowrap}
+  th{text-align:left;font-size:12px;color:var(--ink-2);font-weight:700;padding:11px 14px;border-bottom:1px solid var(--line);white-space:nowrap;background:var(--surface-2)}
+  td{padding:10px 14px;border-bottom:1px solid var(--line);font-size:14px;white-space:nowrap;vertical-align:middle}
+  td.wrap{white-space:normal;min-width:200px}
   tbody tr:last-child td{border-bottom:0}
-  .pill{font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px}
-  .pill.ok,.pill.active,.pill.paid{background:var(--green-wash);color:var(--green)}
-  .pill.no,.pill.suspended,.pill.revoked,.pill.due{background:var(--red-wash);color:var(--red)}
-  .pill.partial{background:#FEF3E2;color:#B8770B}
+  tbody tr:hover td{background:var(--surface-2)}
+  td .acts{display:flex;gap:6px;justify-content:flex-end}
+  .pill{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--surface-2);color:var(--ink-2);text-transform:capitalize}
+  .pill.ok{background:var(--green-wash);color:var(--green)}
+  .pill.bad{background:var(--red-wash);color:var(--red)}
+  .pill.warn{background:var(--amber-wash);color:var(--amber)}
+  .pill.info{background:var(--primary-wash);color:var(--primary-ink)}
   .key{font-family:ui-monospace,Menlo,Consolas,monospace;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:3px 8px;font-size:13px}
-  .row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1;min-width:160px}
-  .muted{color:var(--ink-3)}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:820px){.grid2{grid-template-columns:1fr}.shell{grid-template-columns:1fr}.sidebar{position:static;height:auto}}
-  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(120%);background:var(--ink);color:var(--surface);padding:11px 16px;border-radius:12px;font-weight:600;font-size:14px;box-shadow:var(--shadow);transition:transform .3s;z-index:50}
-  .toast.show{transform:translateX(-50%) translateY(0)}
+  .row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1;min-width:150px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-bottom:18px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+  .card h4{font-size:15px;font-weight:800}
+  .card .meta{color:var(--ink-3);font-size:12.5px;margin-top:3px}
+  .card .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+  .bar{height:8px;border-radius:8px;background:var(--surface-2);overflow:hidden;margin-top:10px}
+  .bar>i{display:block;height:100%;background:var(--primary);border-radius:8px}
+  .bar.ok>i{background:var(--green)}.bar.warn>i{background:var(--amber)}.bar.bad>i{background:var(--red)}
+  .minibar{display:inline-block;width:60px;height:6px;border-radius:6px;background:var(--surface-2);vertical-align:middle;margin-right:6px;overflow:hidden}.minibar>i{display:block;height:100%;background:var(--green)}
+  .chart{display:flex;align-items:flex-end;gap:10px;height:150px;padding-top:10px}
+  .chart .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+  .chart .col i{display:block;width:100%;max-width:38px;background:var(--primary);border-radius:6px 6px 3px 3px;min-height:3px}
+  .chart .col span{font-size:11.5px;color:var(--ink-3)}.chart .col b{font-size:11.5px}
+  .hbars .hb{display:grid;grid-template-columns:120px 1fr 60px;gap:10px;align-items:center;margin-bottom:9px;font-size:13px}
+  .hbars .hb .bar{margin:0}
+  .list .it{padding:11px 0;border-bottom:1px solid var(--line)}.list .it:last-child{border-bottom:0}
+  .list .it b{display:block}
+  .empty{padding:34px 16px;text-align:center;color:var(--ink-3)}
+  .pager{display:flex;align-items:center;gap:8px;justify-content:flex-end;padding:10px 14px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+  .att{display:inline-flex;gap:4px}
+  .att button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:8px;width:34px;height:30px;font-weight:800;font-size:12.5px}
+  .att button.on.p{background:var(--green);border-color:var(--green);color:#fff}
+  .att button.on.a{background:var(--red);border-color:var(--red);color:#fff}
+  .att button.on.l{background:var(--amber);border-color:var(--amber);color:#fff}
+  .tt td{white-space:normal;min-width:120px;vertical-align:top;padding:8px}
+  .slot{border-radius:10px;padding:8px 10px;background:var(--primary-wash);color:var(--primary-ink);font-size:13px;min-height:54px}
+  .slot small{display:block;color:var(--ink-2);font-size:11.5px;margin-top:2px}
+  .slot.empty-slot{background:none;border:1px dashed var(--line);color:var(--ink-3);display:grid;place-items:center}
+  button.slotbtn{all:unset;display:block;width:100%;cursor:pointer;border-radius:10px}
+  button.slotbtn:focus-visible{outline:3px solid var(--primary)}
+  .map{width:100%;height:280px;border:0;border-radius:12px;background:var(--surface-2)}
+  .lock{min-height:100vh;display:grid;place-items:center;padding:20px;text-align:center}
+  .lock .box{max-width:440px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:30px;box-shadow:var(--shadow)}
+
+  /* Modal */
+  .overlay{position:fixed;inset:0;background:rgba(10,12,22,.5);display:grid;place-items:center;padding:16px;z-index:60;animation:fade .15s}
+  .modal{background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.25);width:100%;max-width:520px;max-height:calc(100vh - 32px);display:flex;flex-direction:column}
+  .modal.wide{max-width:720px}
+  .modal-h{padding:18px 20px 10px;display:flex;align-items:center;gap:10px}.modal-h h3{font-size:17px;font-weight:800;flex:1}
+  .modal-b{padding:6px 20px 8px;overflow:auto}
+  .modal-f{padding:12px 20px 18px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+  .modal-f .sp{flex:1}
+  .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}.fgrid .full{grid-column:1/-1}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(calc(100% + 30px));visibility:hidden;background:var(--ink);color:var(--surface);padding:11px 16px;border-radius:12px;font-weight:600;font-size:14px;box-shadow:var(--shadow);transition:transform .3s;z-index:80;max-width:calc(100vw - 32px)}
+  .toast.show{transform:translateX(-50%) translateY(0);visibility:visible}
+
+  @media(max-width:900px){
+    .grid2{grid-template-columns:1fr}
+    .shell{grid-template-columns:1fr}
+    .sidebar{position:fixed;left:0;top:0;bottom:0;width:260px;transform:translateX(-100%);transition:transform .2s;box-shadow:var(--shadow)}
+    .sidebar.open{transform:none}
+    .scrim.open{display:block;position:fixed;inset:0;background:rgba(10,12,22,.4);z-index:25}
+    .menu-btn{display:inline-flex}
+    .content{padding:16px}
+    .top{padding:10px 16px}
+    .acct-btn .who{display:none}
+    .fgrid{grid-template-columns:1fr}
+    .toolbar input,.toolbar select,.toolbar input[type=search]{min-width:0;flex:1 1 140px}
+  }
 </style>
 </head>
 <body>
 <div id="root"></div>
+<div id="modalRoot"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 (function(){
   "use strict";
-  const $ = s => document.querySelector(s);
+  const $ = (s, r) => (r || document).querySelector(s);
+  const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   const root = $("#root");
   const LS = "scholar_live_session";
 
-  const S = load() || { base: defaultBase(), mode:null, tenant:"", token:"", user:null, view:"" };
+  const S = Object.assign({ base: defaultBase(), mode: null, tenant: "", token: "", user: null, view: "" }, load() || {});
+  const CFG = { settings: {}, classes: [] };       // runtime caches
+  const VS = {};                                   // per-view filters, kept while navigating
+  let refreshTimer = null;
+
   function load(){ try{ return JSON.parse(localStorage.getItem(LS)); }catch(e){ return null; } }
   function save(){ try{ localStorage.setItem(LS, JSON.stringify(S)); }catch(e){} }
-  function defaultBase(){ return (location.origin && location.origin.startsWith("http")) ? location.origin : "http://127.0.0.1:8000"; }
+  function defaultBase(){ return (location.protocol.startsWith("http") && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? location.origin : "http://127.0.0.1:8000"); }
+  const isLocal = () => /\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(S.base);
 
-  function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2600); }
-  const esc = s => (s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2800); }
+  const esc = s => (s==null?"":String(s)).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+  const today = () => new Date(Date.now() - new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
+  const addDays = (n) => new Date(Date.now() + n*864e5 - new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
 
-  // ---- API ----
+  // ---------------- formatting ----------------
+  function money(n){
+    const cur = CFG.settings.currency || "INR";
+    try { return new Intl.NumberFormat(cur==="INR"?"en-IN":undefined, { style:"currency", currency:cur, maximumFractionDigits:0 }).format(Number(n||0)); }
+    catch(e){ return cur+" "+Number(n||0).toLocaleString(); }
+  }
+  const num = n => Number(n||0).toLocaleString("en-IN");
+  function fdate(d){
+    if(!d) return "—";
+    const s = String(d); const dt = /^\d{4}-\d{2}-\d{2}$/.test(s) ? new Date(s+"T00:00:00") : new Date(s);
+    return isNaN(dt) ? esc(s) : dt.toLocaleDateString("en-IN",{ day:"2-digit", month:"short", year:"numeric" });
+  }
+  function ago(d){
+    if(!d) return "never"; const s = (Date.now() - new Date(d))/1000;
+    if(s < 60) return "just now"; if(s < 3600) return Math.floor(s/60)+" min ago"; if(s < 86400) return Math.floor(s/3600)+" h ago"; return fdate(d);
+  }
+  const PILL = { paid:"ok", active:"ok", present:"ok", approved:"ok", returned:"ok", sent:"ok", on_route:"ok", enrolled:"info",
+                 partial:"warn", leave:"warn", pending:"warn", draft:"warn", idle:"", issued:"info", maintenance:"warn", expired:"bad",
+                 due:"bad", absent:"bad", rejected:"bad", suspended:"bad", revoked:"bad", overdue:"bad", none:"" };
+  const pill = (s, label) => `<span class="pill ${PILL[s]??""}">${esc(label ?? String(s||"—").replace(/_/g," "))}</span>`;
+  const pct = (a,b) => b ? Math.round(a*100/b) : 0;
+  const initials = n => String(n||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();
+
+  // ---------------- API ----------------
+  function qs(obj){ const p = new URLSearchParams(); Object.entries(obj||{}).forEach(([k,v])=>{ if(v!==undefined && v!==null && v!=="") p.set(k,v); }); const s=p.toString(); return s?"?"+s:""; }
   async function api(path, opts){
     opts = opts || {};
-    const headers = { "Accept":"application/json", "Content-Type":"application/json" };
+    const headers = { "Accept": opts.raw ? "*/*" : "application/json", "Content-Type":"application/json" };
     if (S.mode === "school" && S.tenant) headers["X-Tenant"] = S.tenant;
     if (S.token) headers["Authorization"] = "Bearer " + S.token;
     let res;
     try {
-      res = await fetch(S.base.replace(/\/$/,"") + path, {
-        method: opts.method || "GET", headers,
-        body: opts.body ? JSON.stringify(opts.body) : undefined,
+      res = await fetch(S.base.replace(/\/$/,"") + path + qs(opts.query), {
+        method: opts.method || "GET", headers, body: opts.body ? JSON.stringify(opts.body) : undefined,
       });
-    } catch(e){ throw { message: "Cannot reach the API at " + S.base + ". Is the server running and the URL correct?" }; }
-    let data = null; try { data = await res.json(); } catch(e){}
-    if (res.status === 401 && S.token) { doLogout(true); throw { message:"Session expired — please sign in again." }; }
-    if (!res.ok) throw { status: res.status, message: (data && (data.message || firstError(data))) || ("Request failed ("+res.status+")"), data };
+    } catch(e){ throw Object.assign(new Error("Cannot reach the server at " + S.base + ". Check your internet connection and the server URL."), { network:true }); }
+    if (opts.raw && res.ok) return res;
+    let data = null; if (res.status !== 204) { try { data = await res.json(); } catch(e){} }
+    if (res.status === 401 && S.token) { doLogout(true); toast("Your session ended — please sign in again."); throw Object.assign(new Error("Session expired"), { handled:true }); }
+    if (res.status === 403 && data && data.code === "license_inactive" && S.mode === "school") { renderLocked(data.message); throw Object.assign(new Error(data.message), { handled:true }); }
+    if (!res.ok) {
+      const msg = (data && (data.errors ? firstError(data) : data.message)) || ("Request failed ("+res.status+")");
+      throw Object.assign(new Error(res.status===429 ? "Too many attempts. Please wait a minute and try again." : msg), { status: res.status, errors: data && data.errors, data });
+    }
     return data;
   }
-  function firstError(d){ if(d && d.errors){ const k=Object.keys(d.errors)[0]; return d.errors[k][0]; } return null; }
+  function firstError(d){ const k = Object.keys(d.errors||{})[0]; return k ? d.errors[k][0] : d.message; }
+
+  // ---------------- roles ----------------
+  const roles = () => (S.user && S.user.roles) || [];
+  const can = (...r) => roles().includes("super-admin") || r.some(x => roles().includes(x));
+
+  // ---------------- icons ----------------
+  const I = {
+    dash:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
+    students:'<path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/>',
+    admit:'<path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/>',
+    staff:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+    att:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/>',
+    exam:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+    time:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    fee:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/>',
+    lib:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/>',
+    bus:'<path d="M8 6v6M16 6v6M2 12h19.6"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/><path d="M18 18h3V9c0-1.4-1.6-3-3-3H6C4.6 6 3 7.6 3 9v9h3"/>',
+    hostel:'<path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/>',
+    comm:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+    report:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/>',
+    users:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 12 0v1"/><path d="m17 11 2 2 4-4"/>',
+    gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+    school:'<path d="m4 10 8-6 8 6v10H4z"/><path d="M10 20v-5h4v5"/>',
+    key:'<circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.7 12.3 9.8-9.8M17 6l3 3M14 9l2 2"/>',
+    plus:'<path d="M12 5v14M5 12h14"/>',
+    menu:'<path d="M3 6h18M3 12h18M3 18h18"/>',
+    x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  };
+  const svg = (p) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18">${p}</svg>`;
+
+  // ---------------- navigation model ----------------
+  const ALL = ["admin","teacher","accountant","driver","student","parent"];
+  const SCHOOL_NAV = [
+    { g:"Overview",    items:[["dashboard","Dashboard",I.dash,["admin","teacher","accountant"]]] },
+    { g:"People",      items:[["students","Students",I.students,["admin","teacher","accountant"]],["admissions","Admissions",I.admit,["admin","teacher"]],["staff","Staff & HR",I.staff,["admin","teacher"]]] },
+    { g:"Academics",   items:[["attendance","Attendance",I.att,["admin","teacher"]],["exams","Exams & Results",I.exam,["admin","teacher"]],["timetable","Timetable",I.time,ALL]] },
+    { g:"Finance",     items:[["fees","Fee Collection",I.fee,["admin","accountant"]]] },
+    { g:"Campus",      items:[["library","Library",I.lib,["admin","teacher"]],["transport","Transport",I.bus,["admin","teacher","driver"]],["hostel","Hostel",I.hostel,["admin","teacher"]],["communication","Announcements",I.comm,ALL]] },
+    { g:"Administration", items:[["reports","Reports",I.report,["admin","accountant"]],["users","Users & Roles",I.users,["admin"]],["settings","Settings",I.gear,["admin"]]] },
+  ];
+  const OWNER_NAV = [
+    { g:"Control plane", items:[["overview","Overview",I.dash],["schools","Schools",I.school],["licenses","Licenses",I.key],["issue","Issue license",I.plus],["provision","Provision school",I.school]] },
+  ];
+  function navGroups(){
+    if (S.mode === "owner") return OWNER_NAV;
+    return SCHOOL_NAV.map(g => ({ g:g.g, items:g.items.filter(it => can(...it[3])) })).filter(g => g.items.length);
+  }
+  const TITLES = {};
+  [...SCHOOL_NAV, ...OWNER_NAV].forEach(g => g.items.forEach(it => TITLES[it[0]] = it[1]));
 
   // ================= LOGIN =================
-  let loginMode = "school";
+  let loginMode = S.mode === "owner" ? "owner" : "school";
   function renderLogin(){
+    stopRefresh();
+    const demos = loginMode === "school"
+      ? [["Admin","admin@greenfield.test"],["Accountant","accountant@greenfield.test"],["Teacher","teacher@greenfield.test"],["Driver","driver@greenfield.test"],["Parent","parent@greenfield.test"]]
+      : [["Owner","owner@chenthur.tech"]];
     root.innerHTML = `
-    <div class="login-wrap"><div class="login">
+    <div class="login-wrap"><form class="login" id="loginForm" novalidate>
       <div class="login-head">
         <div class="brandmark">S</div>
         <h1>Scholar ERP</h1>
-        <p>by Chenthur Info Tech</p>
+        <p>School management · by Chenthur Info Tech</p>
       </div>
-      <div class="tabs">
-        <button id="tabSchool" class="${loginMode==='school'?'on':''}">School login</button>
-        <button id="tabOwner" class="${loginMode==='owner'?'on':''}">Owner (control plane)</button>
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" id="tabSchool" aria-selected="${loginMode==='school'}" class="${loginMode==='school'?'on':''}">School login</button>
+        <button type="button" role="tab" id="tabOwner" aria-selected="${loginMode==='owner'}" class="${loginMode==='owner'?'on':''}">Owner console</button>
       </div>
       <div class="login-body">
-        <div class="err" id="loginErr"></div>
-        <div class="field"><label for="base">API server URL</label><input id="base" value="${esc(S.base)}"><div class="hint">Where your Laravel API runs (e.g. http://127.0.0.1:8000)</div></div>
-        <div id="schoolFields" style="${loginMode==='owner'?'display:none':''}">
-          <div class="field"><label for="tenant">School ID</label><input id="tenant" value="${esc(S.tenant||'greenfield')}" placeholder="e.g. greenfield"></div>
-        </div>
-        <div class="field"><label for="email">Email</label><input id="email" type="email" placeholder="${loginMode==='owner'?'owner@chenthur.tech':'admin@greenfield.test'}"></div>
-        <div class="field"><label for="pass">Password</label><input id="pass" type="password" placeholder="••••••••"></div>
-        <button class="btn primary" id="signin" style="width:100%">Sign in</button>
+        <div class="err" id="loginErr" role="alert"></div>
+        ${loginMode==='school' ? `<div class="field"><label for="tenant">School ID</label><input id="tenant" value="${esc(S.tenant||'')}" placeholder="e.g. greenfield" autocomplete="organization" autocapitalize="none"></div>` : ''}
+        <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="username"></div>
+        <div class="field"><label for="pass">Password</label><input id="pass" type="password" autocomplete="current-password"></div>
+        <details class="srv"><summary>Server: ${esc(S.base)}</summary>
+          <div class="field"><label for="base">API server URL</label><input id="base" value="${esc(S.base)}" placeholder="https://api.yourschool.com"></div>
+        </details>
+        <button class="btn primary" id="signin" style="width:100%" type="submit">Sign in</button>
+        ${isLocal() ? `<div class="demo"><div class="hint" style="margin:0 0 8px">Demo accounts (local server only):</div>${demos.map(([l,e])=>`<button type="button" data-demo="${e}">${l}</button>`).join("")}</div>` : ""}
       </div>
-    </div></div>`;
-    $("#tabSchool").onclick = ()=>{ loginMode="school"; renderLogin(); };
-    $("#tabOwner").onclick = ()=>{ loginMode="owner"; renderLogin(); };
-    $("#signin").onclick = signIn;
-    [ "#email","#pass" ].forEach(s=> $(s).addEventListener("keydown",e=>{ if(e.key==="Enter") signIn(); }));
+    </form></div>`;
+    $("#tabSchool").onclick = () => { loginMode="school"; renderLogin(); };
+    $("#tabOwner").onclick  = () => { loginMode="owner"; renderLogin(); };
+    $("#loginForm").onsubmit = (e) => { e.preventDefault(); signIn(); };
+    $$("[data-demo]").forEach(b => b.onclick = () => {
+      $("#email").value = b.dataset.demo;
+      $("#pass").value = loginMode==="owner" ? "ChangeMe123!" : "password123";
+      if ($("#tenant") && !$("#tenant").value) $("#tenant").value = "greenfield";
+      signIn();
+    });
+    ($("#tenant") && !$("#tenant").value ? $("#tenant") : $("#email")).focus();
   }
   async function signIn(){
     const err = $("#loginErr"); err.classList.remove("show");
-    S.base = $("#base").value.trim() || defaultBase();
+    S.base = ($("#base").value.trim() || defaultBase()).replace(/\/$/,"");
     const email = $("#email").value.trim(), password = $("#pass").value;
-    if(!email || !password){ err.textContent="Enter email and password."; err.classList.add("show"); return; }
-    const btn = $("#signin"); btn.disabled=true; btn.textContent="Signing in…";
-    try{
-      if(loginMode === "owner"){
-        S.mode="owner"; S.tenant=""; S.token="";
-        const r = await api("/api/central/login", { method:"POST", body:{ email, password } });
-        S.token=r.token; S.user=r.user; S.view="schools"; save(); renderApp();
-      } else {
-        S.mode="school"; S.tenant=$("#tenant").value.trim(); S.token="";
-        if(!S.tenant){ throw { message:"Enter your School ID." }; }
-        const r = await api("/api/login", { method:"POST", body:{ email, password } });
-        S.token=r.token; S.user=r.user; S.view="dashboard"; save(); renderApp();
-      }
-    }catch(e){ err.textContent = e.message || "Login failed."; err.classList.add("show"); }
-    finally{ btn.disabled=false; btn.textContent="Sign in"; }
+    const tenant = $("#tenant") ? $("#tenant").value.trim().toLowerCase() : "";
+    const show = m => { err.textContent = m; err.classList.add("show"); };
+    if (loginMode==="school" && !tenant) return show("Enter your School ID.");
+    if (!email || !password) return show("Enter your email and password.");
+    const btn = $("#signin"); btn.disabled = true; btn.textContent = "Signing in…";
+    try {
+      S.mode = loginMode==="owner" ? "owner" : "school"; S.tenant = tenant; S.token = "";
+      const r = await api(S.mode==="owner" ? "/api/central/login" : "/api/login", { method:"POST", body:{ email, password } });
+      S.token = r.token; S.user = r.user; S.view = ""; save();
+      await renderApp();
+    } catch(e){ if(!e.handled) show(e.status===403 ? e.message : (e.message || "Sign-in failed.")); }
+    finally { if (btn.isConnected){ btn.disabled = false; btn.textContent = "Sign in"; } }
   }
-
   function doLogout(silent){
-    const wasSchool = S.mode==="school";
-    if(S.token){ api(wasSchool?"/api/logout":"/api/central/logout",{method:"POST"}).catch(()=>{}); }
-    S.token=""; S.user=null; S.view=""; save();
-    if(!silent) toast("Signed out");
+    if (S.token && !silent) api(S.mode==="school" ? "/api/logout" : "/api/central/logout", { method:"POST" }).catch(()=>{});
+    S.token = ""; S.user = null; S.view = ""; save();
+    closeModal();
+    if (!silent) toast("Signed out");
     renderLogin();
+  }
+  function renderLocked(msg){
+    stopRefresh();
+    root.innerHTML = `<div class="lock"><div class="box"><div class="brandmark" style="background:var(--red)">!</div>
+      <h2 style="margin-bottom:8px">License not active</h2><p class="muted">${esc(msg)}</p>
+      <p class="small muted">School ID: <b>${esc(S.tenant)}</b></p><button class="btn primary" id="lockOut">Back to sign in</button></div></div>`;
+    $("#lockOut").onclick = () => doLogout(true);
   }
 
   // ================= APP SHELL =================
-  const SCHOOL_NAV = [["dashboard","Dashboard"],["students","Students"],["users","Users & Roles"],["fees","Fees"],["license","License"]];
-  const OWNER_NAV  = [["schools","Schools"],["licenses","Licenses"],["issue","Issue license"],["provision","Provision school"]];
-
-  function renderApp(){
-    const nav = S.mode==="owner"?OWNER_NAV:SCHOOL_NAV;
+  async function renderApp(){
+    stopRefresh();
+    const groups = navGroups();
+    const allowed = groups.flatMap(g => g.items.map(i => i[0]));
+    if (!allowed.length){ root.innerHTML = `<div class="lock"><div class="box"><h2>No access</h2><p class="muted">Your account has no role yet. Ask your school admin to assign one.</p><button class="btn" id="lockOut">Sign out</button></div></div>`; $("#lockOut").onclick=()=>doLogout(); return; }
+    if (!allowed.includes(S.view)) S.view = allowed[0];
+    save();
+    if (S.mode === "school") { try { CFG.settings = await api("/api/settings") || {}; } catch(e){ if (e.handled) return; } }
+    const schoolName = S.mode==="owner" ? "Control plane" : (CFG.settings.school_name || S.tenant);
+    const u = S.user || {};
+    const roleLabel = S.mode==="owner" ? "Owner" : (roles()[0] || "user");
     root.innerHTML = `
     <div class="shell">
-      <aside class="sidebar">
-        <div class="brand"><div class="m">S</div><div><b>Scholar ERP</b><small>${S.mode==="owner"?"Control plane":"School portal"}</small></div></div>
-        <div class="who"><b>${esc(S.user? (S.user.name||S.user.email):"")}</b><br><span>${S.mode==="owner"?"Chenthur Info Tech":("School: "+esc(S.tenant))}</span></div>
-        <nav class="nav" id="nav">${nav.map(([k,l])=>`<button data-v="${k}" class="${S.view===k?'on':''}">${l}</button>`).join("")}</nav>
-        <div class="foot"><button class="btn" style="width:100%" id="logout">Log out</button></div>
+      <aside class="sidebar" id="sidebar">
+        <div class="brand"><div class="m">S</div><div><b title="${esc(schoolName)}">${esc(schoolName)}</b><small>${S.mode==="owner" ? "Chenthur Info Tech" : "Scholar ERP · "+esc(S.tenant)}</small></div></div>
+        <nav class="nav" id="nav" aria-label="Main">${groups.map(g => `<div class="grp">${esc(g.g)}</div>` + g.items.map(([k,l,ic]) => `<button data-v="${k}" class="${S.view===k?'on':''}" ${S.view===k?'aria-current="page"':''}>${svg(ic)}<span>${esc(l)}</span></button>`).join("")).join("")}</nav>
       </aside>
+      <div class="scrim" id="scrim"></div>
       <div class="main">
-        <div class="top"><h2 id="ttl"></h2><div class="sp"></div>${S.mode==="school"?'<button class="btn sm" id="chpw">Change password</button>':''}</div>
-        <div class="content" id="view"><div class="muted">Loading…</div></div>
+        <header class="top">
+          <button class="btn ghost menu-btn" id="menuBtn" aria-label="Open menu">${svg(I.menu)}</button>
+          <h2 id="ttl"></h2><div class="sp"></div>
+          <div class="acct">
+            <button class="acct-btn" id="acctBtn" aria-haspopup="menu" aria-expanded="false"><span class="avatar">${esc(initials(u.name||u.email))}</span><span class="who"><b>${esc(u.name||u.email||"")}</b><span>${esc(roleLabel)}</span></span></button>
+            <div class="dropdown" id="acctMenu" role="menu">
+              <button role="menuitem" data-a="pw">Change password</button>
+              ${S.mode==="school" ? '<button role="menuitem" data-a="all">Sign out of all devices</button>' : ''}
+              <button role="menuitem" data-a="out">Sign out</button>
+            </div>
+          </div>
+        </header>
+        <main class="content" id="view"></main>
       </div>
     </div>`;
-    $("#nav").querySelectorAll("button").forEach(b=> b.onclick=()=>{ S.view=b.dataset.v; save(); renderApp(); });
-    $("#logout").onclick = ()=>doLogout();
-    if($("#chpw")) $("#chpw").onclick = changePassword;
-    (S.mode==="owner"?OWNER_VIEWS:SCHOOL_VIEWS)[S.view] ? (S.view=S.view) : (S.view = S.mode==="owner"?"schools":"dashboard");
-    const map = S.mode==="owner"?OWNER_VIEWS:SCHOOL_VIEWS;
-    const titles = S.mode==="owner"?{schools:"Schools",licenses:"Licenses",issue:"Issue license",provision:"Provision school"}
-                                   :{dashboard:"Dashboard",students:"Students",users:"Users & Roles",fees:"Fees",license:"License"};
-    $("#ttl").textContent = titles[S.view]||"";
-    map[S.view]();
+    $$("#nav button").forEach(b => b.onclick = () => go(b.dataset.v));
+    const sb = $("#sidebar"), scrim = $("#scrim");
+    $("#menuBtn").onclick = () => { sb.classList.add("open"); scrim.classList.add("open"); };
+    scrim.onclick = () => { sb.classList.remove("open"); scrim.classList.remove("open"); };
+    const menu = $("#acctMenu"), ab = $("#acctBtn");
+    ab.onclick = (e) => { e.stopPropagation(); const o = menu.classList.toggle("open"); ab.setAttribute("aria-expanded", o); };
+    document.onclick = () => { menu.classList.remove("open"); ab.setAttribute("aria-expanded","false"); };
+    menu.onclick = (e) => {
+      const a = e.target.dataset.a; if (!a) return;
+      if (a==="pw") changePassword();
+      if (a==="out") doLogout();
+      if (a==="all") confirmBox("Sign out of every device, including this one?", "Sign out everywhere").then(ok => { if(ok) api("/api/logout-all",{method:"POST"}).finally(()=>doLogout(true)); });
+    };
+    showView();
   }
-  const view = () => $("#view");
-  function fail(e){ view().innerHTML = `<div class="err show">${esc(e.message||"Something went wrong.")}</div>`; }
+  function go(v){ S.view = v; save(); $$("#nav button").forEach(b => { b.classList.toggle("on", b.dataset.v===v); b.toggleAttribute("aria-current", b.dataset.v===v); }); $("#sidebar").classList.remove("open"); $("#scrim").classList.remove("open"); showView(); }
+  async function showView(){
+    stopRefresh(); closeModal();
+    $("#ttl").textContent = TITLES[S.view] || "";
+    document.title = (TITLES[S.view] ? TITLES[S.view]+" · " : "") + "Scholar ERP";
+    const v = $("#view"); v.innerHTML = `<div class="empty">Loading…</div>`;
+    const fn = (S.mode==="owner" ? OWNER : SCHOOL)[S.view];
+    try { await fn(v); } catch(e){ if (!e.handled && v.isConnected) v.innerHTML = errBox(e.message); }
+    window.scrollTo(0,0);
+  }
+  const stopRefresh = () => { if (refreshTimer){ clearInterval(refreshTimer); refreshTimer = null; } };
+  const errBox = m => `<div class="err show" role="alert">${esc(m || "Something went wrong.")}</div>`;
+  const vs = (name, def) => (VS[name] = VS[name] || def);
+  function guarded(fn){ return async (...a) => { try { await fn(...a); } catch(e){ if(!e.handled) toast(e.message); } }; }
+
+  // ---------------- UI helpers ----------------
+  const kpi = (cap, val, sub) => `<div class="kpi"><div class="cap">${esc(cap)}</div><div class="num">${val}</div>${sub?`<div class="sub">${sub}</div>`:""}</div>`;
+  function table(cols, rows, empty){
+    if (!rows.length) return `<div class="empty">${esc(empty || "Nothing here yet.")}</div>`;
+    return `<div class="tbl"><table><thead><tr>${cols.map(c=>`<th class="${c.cls||''}">${esc(c.h)}</th>`).join("")}</tr></thead><tbody>${
+      rows.map(r => `<tr>${cols.map(c=>`<td class="${c.cls||''}">${c.f(r)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+  }
+  function pager(meta, onPage){
+    if (!meta || !meta.last_page || meta.last_page <= 1) return meta && meta.total ? `<div class="pager">${num(meta.total)} records</div>` : "";
+    const id = "pg" + Math.random().toString(36).slice(2,7);
+    setTimeout(() => { const el = document.getElementById(id); if(!el) return;
+      el.querySelector("[data-p=prev]").onclick = () => onPage(meta.current_page - 1);
+      el.querySelector("[data-p=next]").onclick = () => onPage(meta.current_page + 1); });
+    return `<div class="pager" id="${id}"><span>${num(meta.from)}–${num(meta.to)} of ${num(meta.total)}</span>
+      <button class="btn sm" data-p="prev" ${meta.current_page<=1?"disabled":""}>‹ Prev</button>
+      <button class="btn sm" data-p="next" ${meta.current_page>=meta.last_page?"disabled":""}>Next ›</button></div>`;
+  }
+  const metaOf = d => d.meta || d;   // Laravel resources nest paging under `meta`
+  function seg(id, options, current){ return `<div class="seg" id="${id}" role="group">${options.map(([v,l])=>`<button type="button" data-v="${esc(v)}" class="${current===v?'on':''}" aria-pressed="${current===v}">${esc(l)}</button>`).join("")}</div>`; }
+  function bindSeg(id, cb){ $$("#"+id+" button").forEach(b => b.onclick = () => cb(b.dataset.v)); }
+  const opts = (list, cur, blank) => (blank!==undefined?`<option value="">${esc(blank)}</option>`:"") + list.map(o => { const [v,l] = Array.isArray(o)?o:[o,o]; return `<option value="${esc(v)}" ${String(cur)===String(v)?"selected":""}>${esc(l)}</option>`; }).join("");
+  const bar = (p, kind) => `<div class="bar ${kind||''}"><i style="width:${Math.max(0,Math.min(100,p))}%"></i></div>`;
+  async function classes(){ if (!CFG.classes.length && can("admin","teacher","accountant")) { try { CFG.classes = (await api("/api/students",{query:{per_page:1}})).classes || []; } catch(e){} } return CFG.classes; }
+  const studentLabel = s => s ? `${s.name} · ${s.class_name||""} (#${s.id})` : "";
+
+  // ---------------- modal + forms ----------------
+  let modalClose = null;
+  function closeModal(){ if (modalClose) modalClose(); }
+  /**
+   * form({ title, fields:[{k,label,type,options,required,placeholder,hint,full,min,max,step,list}],
+   *        values, actions:[{name,label,kind}], onSubmit(values, action) -> truthy keeps modal open })
+   */
+  function form(cfg){
+    return new Promise(resolve => {
+      const values = cfg.values || {};
+      const actions = cfg.actions || [{ name:"save", label: cfg.submit || "Save", kind:"primary" }];
+      const fieldHtml = f => {
+        const id = "f_"+f.k, v = values[f.k] ?? f.value ?? "";
+        let input;
+        if (f.type === "select") input = `<select id="${id}" name="${f.k}">${opts(f.options||[], v, f.blank)}</select>`;
+        else if (f.type === "textarea") input = `<textarea id="${id}" name="${f.k}" placeholder="${esc(f.placeholder||"")}">${esc(v)}</textarea>`;
+        else if (f.type === "student") input = `<input id="${id}" name="${f.k}" list="${id}_dl" autocomplete="off" placeholder="Start typing a student's name…" value="${esc(v)}"><datalist id="${id}_dl"></datalist>`;
+        else input = `<input id="${id}" name="${f.k}" type="${f.type||"text"}" value="${esc(v)}" placeholder="${esc(f.placeholder||"")}" ${f.min!=null?`min="${f.min}"`:""} ${f.max!=null?`max="${f.max}"`:""} ${f.step?`step="${f.step}"`:""} ${f.list?`list="${id}_dl"`:""} ${f.type==="password"?'autocomplete="new-password"':""}>${f.list?`<datalist id="${id}_dl">${f.list.map(o=>`<option value="${esc(o)}">`).join("")}</datalist>`:""}`;
+        return `<div class="field ${f.full||f.type==="textarea"?"full":""}" data-k="${f.k}"><label for="${id}">${esc(f.label)}${f.required?' <span style="color:var(--red)">*</span>':""}</label>${input}${f.hint?`<div class="hint">${esc(f.hint)}</div>`:""}<div class="ferr"></div></div>`;
+      };
+      const fields = cfg.fields || [];
+      const mr = $("#modalRoot");
+      mr.innerHTML = `<div class="overlay" id="ovl"><form class="modal ${cfg.wide?"wide":""}" role="dialog" aria-modal="true" aria-labelledby="mTitle" novalidate>
+        <div class="modal-h"><h3 id="mTitle">${esc(cfg.title)}</h3><button type="button" class="btn ghost sm" data-close aria-label="Close">${svg(I.x)}</button></div>
+        <div class="modal-b"><div class="err" id="mErr" role="alert"></div>${cfg.html||""}<div class="${fields.length>1?"fgrid":""}">${fields.map(fieldHtml).join("")}</div></div>
+        <div class="modal-f">${actions.filter(a=>a.kind==="danger").map(a=>`<button type="button" class="btn danger" data-act="${a.name}">${esc(a.label)}</button>`).join("")}<div class="sp"></div>
+          <button type="button" class="btn" data-close>${esc(cfg.cancel||"Cancel")}</button>
+          ${actions.filter(a=>a.kind!=="danger").map(a=>`<button type="${a.kind==="primary"?"submit":"button"}" class="btn ${a.kind==="primary"?"primary":""}" data-act="${a.name}">${esc(a.label)}</button>`).join("")}</div>
+      </form></div>`;
+      const ovl = $("#ovl"), fm = $("form", ovl), errEl = $("#mErr");
+      const prevFocus = document.activeElement;
+      const done = (val) => { modalClose = null; mr.innerHTML = ""; document.removeEventListener("keydown", onKey); if (prevFocus && prevFocus.focus) prevFocus.focus(); resolve(val); };
+      modalClose = () => done(null);
+      const onKey = e => { if (e.key === "Escape") done(null); };
+      document.addEventListener("keydown", onKey);
+      ovl.addEventListener("mousedown", e => { if (e.target === ovl) done(null); });
+      $$("[data-close]", ovl).forEach(b => b.onclick = () => done(null));
+      // student pickers search the API as you type
+      fields.filter(f => f.type==="student").forEach(f => {
+        const inp = $("#f_"+f.k), dl = $("#f_"+f.k+"_dl");
+        inp.addEventListener("input", debounce(async () => {
+          if (/\(#\d+\)$/.test(inp.value) || inp.value.trim().length < 1) return;
+          try { const d = await api("/api/students", { query:{ search: inp.value.trim(), per_page: 15 } });
+            dl.innerHTML = (d.data||[]).map(s => `<option value="${esc(studentLabel(s))}">`).join(""); } catch(e){}
+        }, 220));
+      });
+      const collect = () => {
+        const out = {}; let bad = false;
+        $$(".field", fm).forEach(el => el.classList.remove("bad"));
+        fields.forEach(f => {
+          const el = fm.elements[f.k]; let v = el.value;
+          if (f.type === "number") v = v === "" ? null : Number(v);
+          else if (f.type === "student") { const m = /\(#(\d+)\)\s*$/.exec(v); v = m ? Number(m[1]) : (v.trim() ? undefined : null); }
+          else if (f.type !== "password") v = v.trim() === "" ? null : v.trim();
+          if (f.type === "student" && v === undefined) { fieldErr(f.k, "Pick a student from the suggestions."); bad = true; return; }
+          if (f.required && (v === null || v === "")) { fieldErr(f.k, f.label + " is required."); bad = true; }
+          if (!(f.type === "password" && v === "" && !f.required)) out[f.k] = v;
+        });
+        return bad ? null : out;
+      };
+      const fieldErr = (k, m) => { const el = $(`.field[data-k="${k}"]`, fm); if (el){ el.classList.add("bad"); $(".ferr", el).textContent = m; } };
+      const run = async (action) => {
+        errEl.classList.remove("show");
+        const vals = action === "save" || !(actions.find(a=>a.name===action)||{}).skipValidate ? collect() : {};
+        if (!vals) return;
+        const btns = $$("button", fm); btns.forEach(b => b.disabled = true);
+        try { const keep = cfg.onSubmit ? await cfg.onSubmit(vals, action) : false; if (!keep) done({ values: vals, action }); }
+        catch(e){
+          if (e.handled) { done(null); return; }
+          if (e.errors) Object.entries(e.errors).forEach(([k,m]) => fieldErr(k.split(".")[0], m[0]));
+          errEl.textContent = e.message; errEl.classList.add("show");
+        } finally { btns.forEach(b => { if (b.isConnected) b.disabled = false; }); }
+      };
+      fm.onsubmit = (e) => { e.preventDefault(); run(actions.find(a=>a.kind==="primary")?.name || "save"); };
+      $$("[data-act]", fm).forEach(b => { if (b.type !== "submit") b.onclick = () => run(b.dataset.act); });
+      const first = $("input,select,textarea", fm); (first || $("[data-close]", fm)).focus();
+    });
+  }
+  function confirmBox(text, okLabel, danger){
+    return form({ title:"Please confirm", html:`<p style="margin:4px 0 10px">${esc(text)}</p>`, fields:[],
+      actions:[{ name:"ok", label: okLabel || "Confirm", kind:"primary" }] }).then(r => !!r);
+  }
+  const confirmDelete = what => confirmBox(`Delete ${what}? This cannot be undone.`, "Delete");
+
+  function changePassword(){
+    const owner = S.mode === "owner";
+    form({ title:"Change password", fields:[
+      { k:"current_password", label:"Current password", type:"password", required:true, full:true },
+      { k:"new_password", label:"New password", type:"password", required:true, hint: owner ? "At least 10 characters." : "At least 8 characters." },
+      { k:"new_password_confirmation", label:"Confirm new password", type:"password", required:true },
+    ], submit:"Update password", onSubmit: async v => {
+      await api(owner ? "/api/central/change-password" : "/api/change-password", { method:"POST", body:v });
+      toast("Password changed — please sign in again."); setTimeout(() => doLogout(true), 50);
+    }});
+  }
+
+  async function download(path, filename){
+    const res = await api(path, { raw:true });
+    const blob = await res.blob(); const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  }
 
   // ================= SCHOOL VIEWS =================
-  const SCHOOL_VIEWS = {
-    async dashboard(){
-      try{
-        const d = await api("/api/dashboard");
-        view().innerHTML = `<div class="kpis">
-          ${kpi("Total students", d.total_students)}
-          ${kpi("Present today", d.present_today)}
-          ${kpi("Fees collected", "₹"+num(d.fees_collected))}
-          ${kpi("Staff on duty", d.staff_on_duty+" / "+d.staff_total)}
-        </div>
-        <div class="panel"><div class="panel-h"><h3>Connected</h3></div><div class="panel-b muted">Live data from <span class="key">${esc(S.base)}</span> · school <b>${esc(S.tenant)}</b>. All figures are read from your Laravel API.</div></div>`;
-      }catch(e){ fail(e); }
-    },
-    async students(){
-      view().innerHTML = `
-        <div class="panel"><div class="panel-h"><h3>Add student</h3></div><div class="panel-b">
-          <div class="row">
-            <div><label>Name</label><input id="sName" placeholder="Full name"></div>
-            <div><label>Class</label><input id="sClass" placeholder="e.g. Class 6-A"></div>
-            <div style="max-width:120px"><label>Roll</label><input id="sRoll" type="number"></div>
-            <div style="max-width:150px;align-self:end"><button class="btn primary" id="sAdd" style="width:100%">Add</button></div>
-          </div><div class="err" id="sErr"></div>
+  const SCHOOL = {};
+
+  SCHOOL.dashboard = async (v) => {
+    const d = await api("/api/dashboard");
+    const showFees = can("admin","accountant");
+    const trend = d.attendance_trend || [];
+    v.innerHTML = `
+      <div class="kpis">
+        ${kpi("Students", num(d.total_students), "enrolled")}
+        ${kpi("Present today", d.marked_today ? `${num(d.present_today)}<span class="muted" style="font-size:15px"> / ${num(d.marked_today)}</span>` : "—", d.marked_today ? pct(d.present_today,d.marked_today)+"% attendance" : "attendance not marked yet")}
+        ${showFees ? kpi("Fees collected", money(d.fees_collected), `${money(d.fees_due)} outstanding`) : ""}
+        ${kpi("Staff on duty", `${num(d.staff_on_duty)}<span class="muted" style="font-size:15px"> / ${num(d.staff_total)}</span>`, "today")}
+        ${kpi("Pending admissions", num(d.pending_admissions), "awaiting review")}
+        ${kpi("Books on loan", num(d.books_on_loan), "library")}
+      </div>
+      <div class="grid2">
+        <div class="panel"><div class="panel-h"><h3>Attendance · last 7 days</h3></div><div class="panel-b">
+          ${trend.length ? `<div class="chart" role="img" aria-label="Daily attendance percentage">${trend.map(t => `<div class="col"><b>${t.pct}%</b><i style="height:${Math.max(3,t.pct)}%"></i><span>${new Date(t.date+"T00:00:00").toLocaleDateString("en-IN",{weekday:"short"})}</span></div>`).join("")}</div>` : `<div class="empty">No attendance marked in the last week.</div>`}
         </div></div>
-        <div class="panel"><div class="panel-h"><h3>Students</h3><div class="sp"></div><input id="sSearch" placeholder="Search…" style="max-width:220px"></div>
-          <div class="tbl"><table><thead><tr><th>Name</th><th>Class</th><th>Roll</th><th>Fee</th><th>Att%</th><th></th></tr></thead><tbody id="sBody"><tr><td colspan="6" class="muted">Loading…</td></tr></tbody></table></div>
-        </div>`;
-      $("#sAdd").onclick = async ()=>{
-        const err=$("#sErr"); err.classList.remove("show");
-        const body={ name:$("#sName").value.trim(), class_name:$("#sClass").value.trim(), roll_no:$("#sRoll").value||null };
-        if(!body.name||!body.class_name){ err.textContent="Name and class are required."; err.classList.add("show"); return; }
-        try{ await api("/api/students",{method:"POST",body}); $("#sName").value="";$("#sRoll").value=""; toast("Student added"); loadStudents(); }
-        catch(e){ err.textContent=e.message; err.classList.add("show"); }
-      };
-      $("#sSearch").addEventListener("input", ()=>loadStudents($("#sSearch").value));
-      loadStudents();
-      async function loadStudents(q){
-        try{
-          const d = await api("/api/students"+(q?("?search="+encodeURIComponent(q)):""));
-          const rows = (d.data||[]).map(s=>`<tr>
-            <td><b>${esc(s.name)}</b></td><td>${esc(s.class_name)}</td><td>${esc(s.roll_no)}</td>
-            <td><span class="pill ${s.fee_status}">${esc(s.fee_status)}</span></td><td>${esc(s.attendance_pct)}%</td>
-            <td style="text-align:right"><button class="btn sm" data-paid="${s.id}">Mark paid</button> <button class="btn sm danger" data-del="${s.id}">Delete</button></td></tr>`).join("")
-            || `<tr><td colspan="6" class="muted">No students.</td></tr>`;
-          $("#sBody").innerHTML = rows;
-          $("#sBody").querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{ try{ await api("/api/students/"+b.dataset.del,{method:"DELETE"}); toast("Deleted"); loadStudents($("#sSearch").value);}catch(e){toast(e.message);} });
-          $("#sBody").querySelectorAll("[data-paid]").forEach(b=>b.onclick=async()=>{ try{ await api("/api/students/"+b.dataset.paid,{method:"PUT",body:{fee_status:"paid"}}); toast("Updated"); loadStudents($("#sSearch").value);}catch(e){toast(e.message);} });
-        }catch(e){ $("#sBody").innerHTML = `<tr><td colspan="6"><span class="pill no">${esc(e.message)}</span></td></tr>`; }
-      }
-    },
-    async users(){
-      let roles=[];
-      try{ roles = (await api("/api/roles")).roles || []; }catch(e){ return fail(e); }
-      view().innerHTML = `
-        <div class="panel"><div class="panel-h"><h3>Create user &amp; assign role</h3></div><div class="panel-b">
-          <div class="row">
-            <div><label>Name</label><input id="uName"></div>
-            <div><label>Email</label><input id="uEmail" type="email"></div>
-            <div><label>Password</label><input id="uPass" type="password"></div>
-            <div style="max-width:160px"><label>Role</label><select id="uRole">${roles.map(r=>`<option>${esc(r)}</option>`).join("")}</select></div>
-            <div style="max-width:130px;align-self:end"><button class="btn primary" id="uAdd" style="width:100%">Create</button></div>
-          </div><div class="err" id="uErr"></div>
-          <div class="hint">Only school admins can manage users — this is your role-wise access control.</div>
+        <div class="panel"><div class="panel-h"><h3>Recent announcements</h3><div class="sp"></div><button class="btn sm" id="goComm">View all</button></div><div class="panel-b list">
+          ${(d.recent_announcements||[]).map(a => `<div class="it"><b>${esc(a.title)}</b><span class="small muted">${pill(a.status)} · ${esc(a.channel)} → ${esc(a.audience)} · ${ago(a.sent_at||a.created_at)}</span></div>`).join("") || `<div class="empty">No announcements yet.</div>`}
         </div></div>
-        <div class="panel"><div class="panel-h"><h3>Users</h3></div>
-          <div class="tbl"><table><thead><tr><th>Name</th><th>Email</th><th>Roles</th><th></th></tr></thead><tbody id="uBody"><tr><td colspan="4" class="muted">Loading…</td></tr></tbody></table></div>
-        </div>`;
-      $("#uAdd").onclick = async ()=>{
-        const err=$("#uErr"); err.classList.remove("show");
-        const body={ name:$("#uName").value.trim(), email:$("#uEmail").value.trim(), password:$("#uPass").value, role:$("#uRole").value };
-        try{ await api("/api/users",{method:"POST",body}); $("#uName").value="";$("#uEmail").value="";$("#uPass").value=""; toast("User created"); loadUsers(); }
-        catch(e){ err.textContent=e.message; err.classList.add("show"); }
-      };
-      loadUsers();
-      async function loadUsers(){
-        try{
-          const d = await api("/api/users");
-          $("#uBody").innerHTML = (d.data||[]).map(u=>`<tr><td><b>${esc(u.name)}</b></td><td>${esc(u.email)}</td>
-            <td>${(u.roles||[]).map(r=>`<span class="pill ok">${esc(r)}</span>`).join(" ")}</td>
-            <td style="text-align:right"><button class="btn sm danger" data-del="${u.id}">Delete</button></td></tr>`).join("")
-            || `<tr><td colspan="4" class="muted">No users.</td></tr>`;
-          $("#uBody").querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{ try{ await api("/api/users/"+b.dataset.del,{method:"DELETE"}); toast("Deleted"); loadUsers(); }catch(e){toast(e.message);} });
-        }catch(e){ $("#uBody").innerHTML=`<tr><td colspan="4"><span class="pill no">${esc(e.message)}</span></td></tr>`; }
-      }
-    },
-    async fees(){
-      view().innerHTML = `<div class="panel"><div class="panel-h"><h3>Fee invoices</h3></div>
-        <div class="tbl"><table><thead><tr><th>Invoice</th><th>Student</th><th>Amount</th><th>Status</th><th></th></tr></thead><tbody id="fBody"><tr><td colspan="5" class="muted">Loading…</td></tr></tbody></table></div></div>`;
-      try{
-        const d = await api("/api/fees");
-        $("#fBody").innerHTML = (d.data||[]).map(f=>`<tr><td><b>${esc(f.invoice_no)}</b></td><td>${esc(f.student?f.student.name:'-')}</td>
-          <td>₹${num(f.amount)}</td><td><span class="pill ${f.status}">${esc(f.status)}</span></td>
-          <td style="text-align:right">${f.status!=='paid'?`<button class="btn sm" data-c="${f.id}">Collect</button>`:'✓'}</td></tr>`).join("")
-          || `<tr><td colspan="5" class="muted">No invoices.</td></tr>`;
-        $("#fBody").querySelectorAll("[data-c]").forEach(b=>b.onclick=async()=>{ try{ await api("/api/fees/"+b.dataset.c+"/collect",{method:"POST"}); toast("Payment recorded"); SCHOOL_VIEWS.fees(); }catch(e){toast(e.message);} });
-      }catch(e){ $("#fBody").innerHTML=`<tr><td colspan="5"><span class="pill no">${esc(e.message)}</span></td></tr>`; }
-    },
-    async license(){
-      try{
-        const l = await api("/api/license");
-        view().innerHTML = `<div class="panel"><div class="panel-h"><h3>License</h3></div><div class="panel-b">
-          <table><tbody>
-            <tr><td class="muted">Licensee</td><td><b>${esc(l.licensee||'-')}</b></td></tr>
-            <tr><td class="muted">Key</td><td><span class="key">${esc(l.key||'-')}</span></td></tr>
-            <tr><td class="muted">Status</td><td><span class="pill ${l.status}">${esc(l.status)}</span></td></tr>
-            <tr><td class="muted">Plan</td><td>${esc(l.plan||'-')}</td></tr>
-            <tr><td class="muted">Expires</td><td>${esc(l.expires_at||'—')}</td></tr>
-            <tr><td class="muted">Issued by</td><td>${esc(l.vendor)}</td></tr>
-          </tbody></table>
-          <div class="hint" style="margin-top:12px">Your school runs while this license is active. For changes, contact ${esc(l.vendor)}.</div>
-        </div></div>`;
-      }catch(e){ fail(e); }
-    },
+      </div>
+      <div class="panel"><div class="panel-h"><h3>Quick actions</h3></div><div class="panel-b" style="display:flex;gap:8px;flex-wrap:wrap">
+        ${can("admin","teacher") ? `<button class="btn" data-go="attendance">${svg(I.att)} Mark attendance</button>` : ""}
+        ${can("admin","accountant") ? `<button class="btn" data-go="fees">${svg(I.fee)} Collect fees</button>` : ""}
+        ${can("admin") ? `<button class="btn" data-go="admissions">${svg(I.admit)} Review admissions</button><button class="btn" data-go="students">${svg(I.students)} Add student</button>` : ""}
+        ${can("admin","teacher") ? `<button class="btn" data-go="communication">${svg(I.comm)} Send announcement</button>` : ""}
+        ${can("admin","accountant") ? `<button class="btn" data-go="reports">${svg(I.report)} Reports</button>` : ""}
+      </div></div>`;
+    $("#goComm").onclick = () => go("communication");
+    $$("[data-go]", v).forEach(b => b.onclick = () => go(b.dataset.go));
   };
 
-  async function changePassword(){
-    const cur = prompt("Current password:"); if(cur===null) return;
-    const nw = prompt("New password (min 8 chars):"); if(nw===null) return;
-    try{ await api("/api/change-password",{method:"POST",body:{current_password:cur,new_password:nw,new_password_confirmation:nw}}); toast("Password changed — sign in again."); doLogout(true); }
-    catch(e){ toast(e.message); }
+  SCHOOL.students = async (v) => {
+    const st = vs("students", { q:"", cls:"", fee:"", page:1 });
+    const admin = can("admin");
+    v.innerHTML = `<div class="toolbar">
+        <input type="search" id="q" placeholder="Search name or phone…" value="${esc(st.q)}" aria-label="Search students">
+        <select id="cls" aria-label="Class"><option value="">All classes</option></select>
+        <select id="fee" aria-label="Fee status">${opts([["","Any fee status"],["paid","Paid"],["partial","Partial"],["due","Due"]], st.fee)}</select>
+        <div class="sp"></div>
+        ${can("admin","accountant") ? `<button class="btn" id="exp">Export CSV</button>` : ""}
+        ${admin ? `<button class="btn primary" id="add">${svg(I.plus)} Add student</button>` : ""}
+      </div><div class="panel" id="list"><div class="empty">Loading…</div></div>`;
+    const load = guarded(async () => {
+      const d = await api("/api/students", { query:{ search:st.q, class:st.cls, fee_status:st.fee, page:st.page } });
+      CFG.classes = d.classes || CFG.classes;
+      $("#cls").innerHTML = opts(CFG.classes, st.cls, "All classes");
+      $("#list").innerHTML = table([
+        { h:"Roll", f:s => esc(s.roll_no ?? "—") },
+        { h:"Name", f:s => `<b>${esc(s.name)}</b>` },
+        { h:"Class", f:s => esc(s.class_name) },
+        { h:"Guardian", f:s => esc(s.guardian_name || "—") },
+        { h:"Phone", f:s => s.guardian_phone ? `<a href="tel:${esc(s.guardian_phone)}">${esc(s.guardian_phone)}</a>` : "—" },
+        { h:"Fees", f:s => pill(s.fee_status) },
+        { h:"Attendance", f:s => `<span class="minibar"><i style="width:${s.attendance_pct}%;background:${s.attendance_pct<75?"var(--red)":"var(--green)"}"></i></span>${esc(s.attendance_pct)}%` },
+        ...(admin ? [{ h:"", cls:"right", f:s => `<div class="acts"><button class="btn sm" data-edit="${s.id}">Edit</button><button class="btn sm danger" data-del="${s.id}">Delete</button></div>` }] : []),
+      ], d.data, st.q||st.cls||st.fee ? "No students match these filters." : "No students yet — add your first student.") + pager(metaOf(d), p => { st.page = p; load(); });
+      $$("[data-edit]", v).forEach(b => b.onclick = () => edit(d.data.find(s => s.id == b.dataset.edit)));
+      $$("[data-del]", v).forEach(b => b.onclick = guarded(async () => {
+        const s = d.data.find(x => x.id == b.dataset.del);
+        if (await confirmDelete(`${s.name} (and their attendance and results)`)) { await api("/api/students/"+s.id, { method:"DELETE" }); toast("Student deleted"); load(); }
+      }));
+    });
+    const fields = (isNew) => [
+      { k:"name", label:"Full name", required:true, full:true },
+      { k:"class_name", label:"Class", required:true, list:CFG.classes, placeholder:"e.g. Class 6-A" },
+      { k:"roll_no", label:"Roll number", type:"number", min:0 },
+      { k:"guardian_name", label:"Guardian name" },
+      { k:"guardian_phone", label:"Guardian phone", type:"tel" },
+      ...(isNew ? [] : [{ k:"fee_status", label:"Fee status", type:"select", options:[["paid","Paid"],["partial","Partial"],["due","Due"]], hint:"Updated automatically when invoices are paid." }]),
+    ];
+    const edit = (s) => form({ title: s ? "Edit student" : "Add student", fields: fields(!s), values: s || {}, submit: s ? "Save changes" : "Add student",
+      onSubmit: async val => { await api(s ? "/api/students/"+s.id : "/api/students", { method: s ? "PUT" : "POST", body: val }); toast(s ? "Student updated" : "Student added"); CFG.classes = []; load(); } });
+    $("#q").addEventListener("input", debounce(() => { st.q = $("#q").value.trim(); st.page = 1; load(); }, 250));
+    $("#cls").onchange = () => { st.cls = $("#cls").value; st.page = 1; load(); };
+    $("#fee").onchange = () => { st.fee = $("#fee").value; st.page = 1; load(); };
+    if ($("#add")) $("#add").onclick = () => edit(null);
+    if ($("#exp")) $("#exp").onclick = guarded(() => download("/api/reports/export/students", "students.csv"));
+    await load();
+  };
+
+  SCHOOL.admissions = async (v) => {
+    const st = vs("admissions", { status:"pending", q:"", page:1 });
+    const admin = can("admin");
+    v.innerHTML = `<div class="toolbar">${seg("stSeg", [["","All"],["pending","Pending"],["approved","Approved"],["rejected","Rejected"],["enrolled","Enrolled"]], st.status)}
+      <input type="search" id="q" placeholder="Search applicant or number…" value="${esc(st.q)}" aria-label="Search applications">
+      <div class="sp"></div>${admin ? `<button class="btn primary" id="add">${svg(I.plus)} New application</button>` : ""}</div>
+      <div class="panel" id="list"><div class="empty">Loading…</div></div>`;
+    const act = (a, verb, msg) => guarded(async () => { const r = await api(`/api/admissions/${a.id}/${verb}`, { method:"POST" }); toast(msg); CFG.classes = []; load(); return r; });
+    const load = guarded(async () => {
+      const d = await api("/api/admissions", { query:{ status:st.status, search:st.q, page:st.page } });
+      $("#list").innerHTML = table([
+        { h:"Application", f:a => `<span class="mono">${esc(a.application_no)}</span>` },
+        { h:"Applicant", f:a => `<b>${esc(a.applicant_name)}</b>` },
+        { h:"Class", f:a => esc(a.class_applied) },
+        { h:"Guardian", f:a => esc(a.guardian_name || "—") + (a.guardian_phone ? `<div class="small muted">${esc(a.guardian_phone)}</div>` : "") },
+        { h:"Applied", f:a => fdate(a.applied_on) },
+        { h:"Status", f:a => pill(a.status) },
+        ...(admin ? [{ h:"", cls:"right", f:a => `<div class="acts">${
+          a.status==="enrolled" ? `<span class="small muted">Student #${esc(a.enrolled_student_id)}</span>` :
+          (a.status!=="approved" ? `<button class="btn sm" data-a="approve" data-id="${a.id}">Approve</button>` : "") +
+          (a.status!=="rejected" ? `<button class="btn sm primary" data-a="enroll" data-id="${a.id}">Enroll</button><button class="btn sm danger" data-a="reject" data-id="${a.id}">Reject</button>` : "") +
+          `<button class="btn sm" data-a="edit" data-id="${a.id}">Edit</button><button class="btn sm danger" data-a="del" data-id="${a.id}">Delete</button>`}</div>` }] : []),
+      ], d.data, "No applications here.") + pager(d, p => { st.page = p; load(); });
+      $$("[data-a]", v).forEach(b => {
+        const a = d.data.find(x => x.id == b.dataset.id);
+        b.onclick = {
+          approve: act(a, "approve", "Application approved"),
+          reject: act(a, "reject", "Application rejected"),
+          enroll: guarded(async () => { if (await confirmBox(`Enroll ${a.applicant_name} into ${a.class_applied}? A student record will be created.`, "Enroll")) { await api(`/api/admissions/${a.id}/enroll`, { method:"POST" }); toast(`${a.applicant_name} enrolled`); CFG.classes = []; load(); } }),
+          edit: () => edit(a),
+          del: guarded(async () => { if (await confirmDelete(`application ${a.application_no}`)) { await api("/api/admissions/"+a.id, { method:"DELETE" }); toast("Application deleted"); load(); } }),
+        }[b.dataset.a];
+      });
+    });
+    const edit = async (a) => form({ title: a ? "Edit application" : "New application", values: a || {}, submit: a ? "Save" : "Submit application", fields:[
+      { k:"applicant_name", label:"Applicant name", required:true, full:true },
+      { k:"class_applied", label:"Class applied for", required:true, list: await classes() },
+      { k:"guardian_name", label:"Guardian name" },
+      { k:"guardian_phone", label:"Guardian phone", type:"tel" },
+    ], onSubmit: async val => { await api(a ? "/api/admissions/"+a.id : "/api/admissions", { method: a ? "PUT" : "POST", body: val }); toast(a ? "Application updated" : "Application received"); load(); } });
+    bindSeg("stSeg", s => { st.status = s; st.page = 1; SCHOOL.admissions(v); });
+    $("#q").addEventListener("input", debounce(() => { st.q = $("#q").value.trim(); st.page = 1; load(); }, 250));
+    if ($("#add")) $("#add").onclick = () => edit(null);
+    await load();
+  };
+
+  SCHOOL.staff = async (v) => {
+    const st = vs("staff", { q:"", page:1 });
+    const admin = can("admin");
+    v.innerHTML = `<div class="toolbar"><input type="search" id="q" placeholder="Search name or role…" value="${esc(st.q)}" aria-label="Search staff"><div class="sp"></div>
+      ${admin ? `<button class="btn primary" id="add">${svg(I.plus)} Add staff member</button>` : ""}</div><div class="panel" id="list"><div class="empty">Loading…</div></div>`;
+    const load = guarded(async () => {
+      const d = await api("/api/staff", { query:{ search:st.q, page:st.page } });
+      $("#list").innerHTML = table([
+        { h:"Name", f:s => `<b>${esc(s.name)}</b>` },
+        { h:"Role", f:s => esc(s.role) },
+        { h:"Department", f:s => esc(s.department || "—") },
+        { h:"Today", f:s => pill(s.status) },
+        { h:"Email", f:s => s.email ? `<a href="mailto:${esc(s.email)}">${esc(s.email)}</a>` : "—" },
+        { h:"Phone", f:s => s.phone ? `<a href="tel:${esc(s.phone)}">${esc(s.phone)}</a>` : "—" },
+        ...(admin ? [{ h:"", cls:"right", f:s => `<div class="acts"><button class="btn sm" data-edit="${s.id}">Edit</button><button class="btn sm danger" data-del="${s.id}">Delete</button></div>` }] : []),
+      ], d.data, "No staff records yet.") + pager(d, p => { st.page = p; load(); });
+      $$("[data-edit]", v).forEach(b => b.onclick = () => edit(d.data.find(s => s.id == b.dataset.edit)));
+      $$("[data-del]", v).forEach(b => b.onclick = guarded(async () => { const s = d.data.find(x => x.id == b.dataset.del);
+        if (await confirmDelete(s.name)) { await api("/api/staff/"+s.id, { method:"DELETE" }); toast("Staff member removed"); load(); } }));
+    });
+    const edit = (s) => form({ title: s ? "Edit staff member" : "Add staff member", values: s || { status:"present" }, submit: s ? "Save" : "Add", fields:[
+      { k:"name", label:"Full name", required:true }, { k:"role", label:"Designation", required:true, placeholder:"e.g. Mathematics Teacher" },
+      { k:"department", label:"Department", list:["Academics","Administration","Support","Transport","Hostel"] },
+      { k:"status", label:"Today", type:"select", options:[["present","Present"],["absent","Absent"],["leave","On leave"]] },
+      { k:"email", label:"Email", type:"email" }, { k:"phone", label:"Phone", type:"tel" },
+    ], onSubmit: async val => { await api(s ? "/api/staff/"+s.id : "/api/staff", { method: s ? "PUT" : "POST", body: val }); toast(s ? "Saved" : "Staff member added"); load(); } });
+    $("#q").addEventListener("input", debounce(() => { st.q = $("#q").value.trim(); st.page = 1; load(); }, 250));
+    if ($("#add")) $("#add").onclick = () => edit(null);
+    await load();
+  };
+
+  SCHOOL.attendance = async (v) => {
+    const st = vs("attendance", { date: today(), cls:"" });
+    const d = await api("/api/attendance", { query:{ date:st.date, class:st.cls } });
+    if (!st.cls && d.classes && d.classes.length) { st.cls = d.classes[0]; return SCHOOL.attendance(v); }
+    const marks = {}; d.students.forEach(s => marks[s.id] = s.status);
+    const unsaved = () => d.students.some(s => marks[s.id] !== s.status);
+    const counts = () => { const c = { present:0, absent:0, leave:0, none:0 }; d.students.forEach(s => c[marks[s.id] || "none"]++); return c; };
+    v.innerHTML = `<div class="toolbar">
+        <input type="date" id="date" value="${esc(st.date)}" max="${today()}" aria-label="Date">
+        <select id="cls" aria-label="Class">${opts(d.classes, st.cls)}</select>
+        <span id="cnt" class="small muted"></span><div class="sp"></div>
+        <button class="btn" id="allP">Mark all present</button>
+        <button class="btn primary" id="saveA">Save attendance</button>
+      </div>
+      <div class="panel">${d.students.length ? table([
+        { h:"Roll", f:s => esc(s.roll_no ?? "—") },
+        { h:"Student", f:s => `<b>${esc(s.name)}</b>` },
+        { h:"Mark", cls:"right", f:s => `<div class="att" role="group" aria-label="Attendance for ${esc(s.name)}" data-s="${s.id}">
+            <button type="button" class="p" data-m="present" title="Present">P</button><button type="button" class="a" data-m="absent" title="Absent">A</button><button type="button" class="l" data-m="leave" title="Leave">L</button></div>` },
+      ], d.students) : `<div class="empty">No students in this class.</div>`}</div>`;
+    const paint = () => {
+      $$(".att", v).forEach(g => $$("button", g).forEach(b => { const on = marks[g.dataset.s] === b.dataset.m; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); }));
+      const c = counts(); $("#cnt").innerHTML = `${c.present} present · ${c.absent} absent · ${c.leave} leave${c.none ? ` · <b style="color:var(--amber)">${c.none} unmarked</b>` : ""}`;
+    };
+    $$(".att button", v).forEach(b => b.onclick = () => { marks[b.parentElement.dataset.s] = b.dataset.m; paint(); });
+    $("#allP").onclick = () => { d.students.forEach(s => marks[s.id] = "present"); paint(); };
+    const reload = async (patch) => { if (unsaved() && !(await confirmBox("You have unsaved marks. Discard them?", "Discard"))) { paint(); return; } Object.assign(st, patch); SCHOOL.attendance(v); };
+    $("#date").onchange = () => reload({ date: $("#date").value || today() });
+    $("#cls").onchange = () => reload({ cls: $("#cls").value });
+    $("#saveA").onclick = guarded(async () => {
+      const body = {}; d.students.forEach(s => { if (marks[s.id]) body[s.id] = marks[s.id]; });
+      if (!Object.keys(body).length) return toast("Mark at least one student first.");
+      await api("/api/attendance", { method:"POST", body:{ date: st.date, marks: body } });
+      d.students.forEach(s => s.status = marks[s.id]);
+      toast(`Attendance saved for ${Object.keys(body).length} students`); paint();
+    });
+    paint();
+  };
+
+  SCHOOL.exams = async (v) => {
+    const st = vs("exams", { exam:"", cls:"" });
+    const d = await api("/api/exams", { query:{ exam:st.exam, class:st.cls } });
+    const cl = await classes();
+    v.innerHTML = `<div class="toolbar">
+        <select id="ex" aria-label="Exam">${opts(d.exams, st.exam, "All exams")}</select>
+        <select id="cls" aria-label="Class">${opts(cl, st.cls, "All classes")}</select><div class="sp"></div>
+        ${can("admin","accountant") ? `<button class="btn" id="exp">Export CSV</button>` : ""}
+        <button class="btn primary" id="add">${svg(I.plus)} Add result</button></div>
+      <div class="panel">${table([
+        { h:"Student", f:r => `<b>${esc(r.student || "—")}</b>` }, { h:"Class", f:r => esc(r.class_name || "—") }, { h:"Exam", f:r => esc(r.exam_name) },
+        { h:"Maths", cls:"right", f:r => esc(r.maths) }, { h:"Science", cls:"right", f:r => esc(r.science) }, { h:"English", cls:"right", f:r => esc(r.english) },
+        { h:"Average", cls:"right", f:r => `<b>${esc(r.average)}%</b>` },
+        { h:"Grade", f:r => pill(r.average>=60?"present":r.average>=45?"leave":"absent", r.grade || "—") },
+        { h:"", cls:"right", f:r => `<div class="acts"><button class="btn sm" data-edit="${r.id}">Edit</button><button class="btn sm danger" data-del="${r.id}">Delete</button></div>` },
+      ], d.data, "No results recorded yet.")}</div>`;
+    const edit = (r) => form({ title: r ? "Edit result" : "Add exam result", values: r ? { ...r, student_id: `${r.student} · ${r.class_name||""} (#${r.student_id})` } : { exam_name: st.exam },
+      submit: r ? "Save" : "Add result", fields:[
+        { k:"student_id", label:"Student", type:"student", required:true, full:true },
+        { k:"exam_name", label:"Exam", required:true, list:d.exams, placeholder:"e.g. Unit Test 3" },
+        { k:"grade", label:"Grade", placeholder:"Auto from average", hint:"Leave blank to grade automatically." },
+        { k:"maths", label:"Maths (0–100)", type:"number", min:0, max:100, required:true },
+        { k:"science", label:"Science (0–100)", type:"number", min:0, max:100, required:true },
+        { k:"english", label:"English (0–100)", type:"number", min:0, max:100, required:true },
+      ], onSubmit: async val => { await api(r ? "/api/exams/"+r.id : "/api/exams", { method: r ? "PUT" : "POST", body: val }); toast(r ? "Result updated" : "Result added"); SCHOOL.exams(v); } });
+    $("#ex").onchange = () => { st.exam = $("#ex").value; SCHOOL.exams(v); };
+    $("#cls").onchange = () => { st.cls = $("#cls").value; SCHOOL.exams(v); };
+    $("#add").onclick = () => edit(null);
+    if ($("#exp")) $("#exp").onclick = guarded(() => download("/api/reports/export/results", "results.csv"));
+    $$("[data-edit]", v).forEach(b => b.onclick = () => edit(d.data.find(r => r.id == b.dataset.edit)));
+    $$("[data-del]", v).forEach(b => b.onclick = guarded(async () => { const r = d.data.find(x => x.id == b.dataset.del);
+      if (await confirmDelete(`${r.student}'s ${r.exam_name} result`)) { await api("/api/exams/"+r.id, { method:"DELETE" }); toast("Result deleted"); SCHOOL.exams(v); } }));
+  };
+
+  SCHOOL.timetable = async (v) => {
+    const st = vs("timetable", { cls:"" });
+    const d = await api("/api/timetable", { query:{ class: st.cls } });
+    st.cls = d.class || "";
+    const admin = can("admin");
+    const days = ["Mon","Tue","Wed","Thu","Fri","Sat"];
+    const maxP = Math.max(6, ...(d.slots||[]).map(s => s.period_no));
+    const allClasses = [...new Set([...(d.classes||[]), ...(admin ? await classes() : [])])].sort();
+    const slotAt = (day, p) => (d.slots||[]).find(s => s.day===day && s.period_no===p);
+    const hm = t => t ? String(t).slice(0,5) : "";
+    v.innerHTML = `<div class="toolbar">
+        ${allClasses.length ? `<select id="cls" aria-label="Class">${opts(allClasses, st.cls)}</select>` : ""}
+        <div class="sp"></div>${admin ? `<button class="btn primary" id="add">${svg(I.plus)} Add period</button>` : ""}</div>
+      ${!st.cls ? `<div class="panel"><div class="empty">No timetable yet.${admin ? " Add the first period to get started." : ""}</div></div>` :
+      `<div class="panel"><div class="tbl"><table class="tt"><thead><tr><th>Period</th>${days.map(x=>`<th>${x}</th>`).join("")}</tr></thead><tbody>
+        ${Array.from({length:maxP}, (_,i) => i+1).map(p => `<tr><th>${p}</th>${days.map(day => { const s = slotAt(day,p);
+          const inner = s ? `<div class="slot"><b>${esc(s.subject)}</b><small>${esc(s.teacher||"")}</small><small>${esc(hm(s.start_time))}${s.end_time?"–"+esc(hm(s.end_time)):""}</small></div>` : `<div class="slot empty-slot">${admin?"+":""}</div>`;
+          return `<td>${admin ? `<button class="slotbtn" data-day="${day}" data-p="${p}" aria-label="${s?"Edit":"Add"} ${day} period ${p}">${inner}</button>` : inner}</td>`; }).join("")}</tr>`).join("")}
+      </tbody></table></div></div>`}`;
+    const edit = (slot, preset) => form({ title: slot ? `${slot.day} · period ${slot.period_no}` : "Add period",
+      values: slot ? { ...slot, start_time: hm(slot.start_time), end_time: hm(slot.end_time) } : { class_name: st.cls, ...preset },
+      actions: slot ? [{ name:"delete", label:"Delete period", kind:"danger", skipValidate:true }, { name:"save", label:"Save", kind:"primary" }] : undefined,
+      submit: "Add period", fields:[
+        { k:"class_name", label:"Class", required:true, list: allClasses, full:true },
+        { k:"day", label:"Day", type:"select", options:days, required:true }, { k:"period_no", label:"Period", type:"number", min:1, max:10, required:true },
+        { k:"subject", label:"Subject", required:true }, { k:"teacher", label:"Teacher" },
+        { k:"start_time", label:"Starts", type:"time" }, { k:"end_time", label:"Ends", type:"time" },
+      ], onSubmit: async (val, action) => {
+        if (action === "delete") { await api("/api/timetable/"+slot.id, { method:"DELETE" }); toast("Period removed"); }
+        else { await api(slot ? "/api/timetable/"+slot.id : "/api/timetable", { method: slot ? "PUT" : "POST", body: val }); toast("Timetable saved"); st.cls = val.class_name; }
+        SCHOOL.timetable(v);
+      } });
+    if ($("#cls")) $("#cls").onchange = () => { st.cls = $("#cls").value; SCHOOL.timetable(v); };
+    if ($("#add")) $("#add").onclick = () => edit(null, {});
+    $$(".slotbtn", v).forEach(b => b.onclick = () => { const s = slotAt(b.dataset.day, +b.dataset.p); edit(s || null, s ? {} : { day:b.dataset.day, period_no:+b.dataset.p }); });
+  };
+
+  SCHOOL.fees = async (v) => {
+    const st = vs("fees", { status:"", q:"", page:1 });
+    v.innerHTML = `<div class="toolbar">${seg("stSeg", [["","All"],["due","Due"],["partial","Partial"],["paid","Paid"]], st.status)}
+        <input type="search" id="q" placeholder="Invoice no. or student…" value="${esc(st.q)}" aria-label="Search invoices"><div class="sp"></div>
+        <button class="btn" id="exp">Export CSV</button><button class="btn" id="bulk">Invoice a class</button>
+        <button class="btn primary" id="add">${svg(I.plus)} New invoice</button></div>
+      <div class="panel" id="list"><div class="empty">Loading…</div></div>`;
+    const load = guarded(async () => {
+      const d = await api("/api/fees", { query:{ status:st.status, search:st.q, page:st.page } });
+      $("#list").innerHTML = table([
+        { h:"Invoice", f:f => `<span class="mono">${esc(f.invoice_no)}</span>` },
+        { h:"Student", f:f => f.student ? `<b>${esc(f.student.name)}</b><div class="small muted">${esc(f.student.class_name||f.class_name||"")}</div>` : esc(f.class_name || "—") },
+        { h:"For", f:f => esc(f.description || "—") },
+        { h:"Amount", cls:"right", f:f => money(f.amount) },
+        { h:"Paid", cls:"right", f:f => money(f.paid_amount) },
+        { h:"Balance", cls:"right", f:f => `<b>${money(f.balance)}</b>` },
+        { h:"Status", f:f => pill(f.status) },
+        { h:"Due", f:f => f.due_on ? `<span style="${f.status!=="paid" && f.due_on < today() ? "color:var(--red);font-weight:700" : ""}">${fdate(f.due_on)}</span>` : "—" },
+        { h:"", cls:"right", f:f => `<div class="acts">${Number(f.balance) > 0 ? `<button class="btn sm primary" data-a="collect" data-id="${f.id}">Collect</button>` : ""}${Number(f.paid_amount) > 0 ? `<button class="btn sm" data-a="receipt" data-id="${f.id}">Receipt</button>` : ""}<button class="btn sm" data-a="edit" data-id="${f.id}">Edit</button><button class="btn sm danger" data-a="del" data-id="${f.id}">Delete</button></div>` },
+      ], d.data, "No invoices here.") + pager(d, p => { st.page = p; load(); });
+      $$("[data-a]", v).forEach(b => { const f = d.data.find(x => x.id == b.dataset.id); b.onclick = {
+        collect: () => form({ title:`Collect payment · ${f.invoice_no}`, html:`<p class="muted" style="margin:0 0 12px">${esc(f.student ? f.student.name : f.class_name || "")} — balance <b>${money(f.balance)}</b> of ${money(f.amount)}</p>`,
+          values:{ amount: Number(f.balance), mode:"cash" }, submit:"Record payment", fields:[
+            { k:"amount", label:"Amount received", type:"number", min:1, max:Number(f.balance), step:"0.01", required:true },
+            { k:"mode", label:"Payment mode", type:"select", options:[["cash","Cash"],["upi","UPI"],["card","Card"],["bank","Bank transfer"],["cheque","Cheque"],["online","Online"]] },
+          ], onSubmit: async val => { const r = await api(`/api/fees/${f.id}/collect`, { method:"POST", body: val }); toast(`Payment recorded · ${r.receipt_no}`); load(); } }),
+        receipt: () => printReceipt(f.id),
+        edit: () => form({ title:`Edit ${f.invoice_no}`, values:f, fields:[
+            { k:"description", label:"For", full:true }, { k:"amount", label:"Amount", type:"number", min:1, step:"0.01", required:true }, { k:"due_on", label:"Due date", type:"date" },
+          ], onSubmit: async val => { await api("/api/fees/"+f.id, { method:"PUT", body: val }); toast("Invoice updated"); load(); } }),
+        del: guarded(async () => { if (await confirmDelete(`invoice ${f.invoice_no}`)) { await api("/api/fees/"+f.id, { method:"DELETE" }); toast("Invoice deleted"); load(); } }),
+      }[b.dataset.a]; });
+    });
+    bindSeg("stSeg", s => { st.status = s; st.page = 1; SCHOOL.fees(v); });
+    $("#q").addEventListener("input", debounce(() => { st.q = $("#q").value.trim(); st.page = 1; load(); }, 250));
+    $("#exp").onclick = guarded(() => download("/api/reports/export/fees", "fees.csv"));
+    $("#add").onclick = () => form({ title:"New invoice", values:{ due_on: addDays(15) }, submit:"Create invoice", fields:[
+      { k:"student_id", label:"Student", type:"student", required:true, full:true },
+      { k:"description", label:"For", placeholder:"e.g. Term 2 tuition", full:true },
+      { k:"amount", label:"Amount", type:"number", min:1, step:"0.01", required:true }, { k:"due_on", label:"Due date", type:"date" },
+    ], onSubmit: async val => { const r = await api("/api/fees", { method:"POST", body: val }); toast(`Invoice ${r.invoice_no} created`); load(); } });
+    $("#bulk").onclick = async () => form({ title:"Invoice a whole class", values:{ due_on: addDays(15) }, submit:"Create invoices",
+      html:`<p class="muted" style="margin:0 0 12px">Creates one invoice for every student currently in the class.</p>`, fields:[
+      { k:"class_name", label:"Class", type:"select", options: await classes(), required:true, full:true },
+      { k:"description", label:"For", required:true, placeholder:"e.g. Term 2 tuition", full:true },
+      { k:"amount", label:"Amount per student", type:"number", min:1, step:"0.01", required:true }, { k:"due_on", label:"Due date", type:"date" },
+    ], onSubmit: async val => { const r = await api("/api/fees/bulk", { method:"POST", body: val }); toast(r.message); load(); } });
+    await load();
+  };
+
+  async function printReceipt(id){
+    // Printed from a hidden in-page frame: no pop-up permission needed (works in
+    // kiosk browsers and mobile WebViews too).
+    try {
+      const { school, invoice:f } = await api(`/api/fees/${id}/receipt`);
+      const sc = school || {}; const cur = sc.currency || CFG.settings.currency || "INR";
+      const m = n => { try { return new Intl.NumberFormat(cur==="INR"?"en-IN":undefined,{style:"currency",currency:cur}).format(Number(n||0)); } catch(e){ return cur+" "+n; } };
+      const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Receipt ${esc(f.receipt_no||"")}</title>
+      <style>body{font-family:system-ui,Segoe UI,Roboto,sans-serif;color:#171A2B;margin:0;padding:32px}.r{max-width:640px;margin:auto;border:1px solid #ddd;border-radius:12px;padding:28px}
+      h1{margin:0;font-size:22px}.muted{color:#666;font-size:13px}table{width:100%;border-collapse:collapse;margin:18px 0}td{padding:8px 0;border-bottom:1px solid #eee;font-size:14px}td:last-child{text-align:right}
+      .tot td{font-weight:800;font-size:16px;border-bottom:0}.hd{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;border-bottom:2px solid #171A2B;padding-bottom:14px;margin-bottom:14px}
+      .stamp{display:inline-block;border:2px solid ${Number(f.balance)>0?"#B8770B":"#0FA968"};color:${Number(f.balance)>0?"#B8770B":"#0FA968"};padding:4px 12px;border-radius:8px;font-weight:800;letter-spacing:.08em}
+      @media print{body{padding:0}.r{border:0}}</style></head><body><div class="r">
+      <div class="hd"><div><h1>${esc(sc.school_name||"School")}</h1><div class="muted">${esc(sc.address||"")}</div><div class="muted">${esc([sc.phone,sc.email].filter(Boolean).join(" · "))}</div></div>
+      <div style="text-align:right"><b>FEE RECEIPT</b><div class="muted">${esc(f.receipt_no||"")}</div><div class="muted">${fdate(f.paid_on)}</div></div></div>
+      <table><tr><td>Student</td><td><b>${esc(f.student?f.student.name:"—")}</b></td></tr><tr><td>Class</td><td>${esc(f.class_name||(f.student&&f.student.class_name)||"—")}</td></tr>
+      <tr><td>Invoice</td><td>${esc(f.invoice_no)}</td></tr><tr><td>For</td><td>${esc(f.description||"School fees")}</td></tr>
+      ${sc.academic_year?`<tr><td>Academic year</td><td>${esc(sc.academic_year)}</td></tr>`:""}<tr><td>Payment mode</td><td style="text-transform:uppercase">${esc(f.payment_mode||"—")}</td></tr>
+      <tr><td>Invoice amount</td><td>${m(f.amount)}</td></tr><tr class="tot"><td>Total paid</td><td>${m(f.paid_amount)}</td></tr><tr><td>Balance</td><td>${m(f.balance)}</td></tr></table>
+      <span class="stamp">${Number(f.balance)>0?"PART PAID":"PAID IN FULL"}</span>
+      <p class="muted" style="margin-top:28px">This is a computer-generated receipt.</p></div></body></html>`;
+      let fr = document.getElementById("rcptFrame");
+      if (fr) fr.remove();
+      fr = document.createElement("iframe");
+      fr.id = "rcptFrame"; fr.title = "Fee receipt"; fr.setAttribute("aria-hidden", "true");
+      fr.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden";
+      document.body.appendChild(fr);
+      fr.contentDocument.open(); fr.contentDocument.write(html); fr.contentDocument.close();
+      setTimeout(() => { fr.contentWindow.focus(); fr.contentWindow.print(); }, 250);
+    } catch(e){ if(!e.handled) toast(e.message); }
   }
 
-  // ================= OWNER (CONTROL PLANE) VIEWS =================
-  const OWNER_VIEWS = {
-    async schools(){
-      view().innerHTML = `<div class="panel"><div class="panel-h"><h3>Schools</h3></div>
-        <div class="tbl"><table><thead><tr><th>ID</th><th>Name</th><th>Plan</th><th>License</th><th></th></tr></thead><tbody id="scBody"><tr><td colspan="5" class="muted">Loading…</td></tr></tbody></table></div></div>`;
-      try{
-        const list = await api("/api/central/schools");
-        $("#scBody").innerHTML = (list||[]).map(t=>`<tr><td><span class="key">${esc(t.id)}</span></td><td><b>${esc(t.name)}</b></td><td>${esc(t.plan)}</td>
-          <td><span class="pill ${t.license_status}">${esc(t.license_status)}</span></td>
-          <td style="text-align:right">${t.license_status==='active'?`<button class="btn sm danger" data-sus="${t.id}">Suspend</button>`:`<button class="btn sm" data-act="${t.id}">Activate</button>`}</td></tr>`).join("")
-          || `<tr><td colspan="5" class="muted">No schools yet — provision one.</td></tr>`;
-        $("#scBody").querySelectorAll("[data-sus]").forEach(b=>b.onclick=async()=>{ try{ await api("/api/central/schools/"+b.dataset.sus+"/suspend",{method:"POST"}); toast("Suspended"); OWNER_VIEWS.schools(); }catch(e){toast(e.message);} });
-        $("#scBody").querySelectorAll("[data-act]").forEach(b=>b.onclick=async()=>{ try{ await api("/api/central/schools/"+b.dataset.act+"/activate",{method:"POST"}); toast("Activated"); OWNER_VIEWS.schools(); }catch(e){toast(e.message);} });
-      }catch(e){ $("#scBody").innerHTML=`<tr><td colspan="5"><span class="pill no">${esc(e.message)}</span></td></tr>`; }
-    },
-    async licenses(){
-      view().innerHTML = `<div class="panel"><div class="panel-h"><h3>Licenses</h3></div>
-        <div class="tbl"><table><thead><tr><th>Key</th><th>Licensee</th><th>Plan</th><th>School</th><th>Status</th><th></th></tr></thead><tbody id="liBody"><tr><td colspan="6" class="muted">Loading…</td></tr></tbody></table></div></div>`;
-      try{
-        const d = await api("/api/central/licenses");
-        $("#liBody").innerHTML = (d.data||[]).map(l=>`<tr><td><span class="key">${esc(l.key)}</span></td><td>${esc(l.licensee)}</td><td>${esc(l.plan)}</td>
-          <td>${esc(l.tenant_id||'—')}</td><td><span class="pill ${l.status}">${esc(l.status)}</span></td>
-          <td style="text-align:right">
-            ${l.status==='active'?`<button class="btn sm danger" data-sus="${l.id}">Suspend</button>`:`<button class="btn sm" data-act="${l.id}">Activate</button>`}
-            <button class="btn sm danger" data-rev="${l.id}">Revoke</button></td></tr>`).join("")
-          || `<tr><td colspan="6" class="muted">No licenses — issue one.</td></tr>`;
-        const act=(id,what)=>async()=>{ try{ await api("/api/central/licenses/"+id+"/"+what,{method:"POST"}); toast(what); OWNER_VIEWS.licenses(); }catch(e){toast(e.message);} };
-        $("#liBody").querySelectorAll("[data-sus]").forEach(b=>b.onclick=act(b.dataset.sus,"suspend"));
-        $("#liBody").querySelectorAll("[data-act]").forEach(b=>b.onclick=act(b.dataset.act,"activate"));
-        $("#liBody").querySelectorAll("[data-rev]").forEach(b=>b.onclick=act(b.dataset.rev,"revoke"));
-      }catch(e){ $("#liBody").innerHTML=`<tr><td colspan="6"><span class="pill no">${esc(e.message)}</span></td></tr>`; }
-    },
-    async issue(){
-      view().innerHTML = `<div class="panel" style="max-width:520px"><div class="panel-h"><h3>Issue a license key</h3></div><div class="panel-b">
-        <div class="field"><label>Licensee (customer / school org)</label><input id="liName" placeholder="e.g. Sunrise Academy"></div>
-        <div class="field"><label>Plan</label><select id="liPlan"><option value="starter">Starter</option><option value="pro">Pro</option><option value="enterprise">Enterprise</option></select></div>
-        <div class="field"><label>Expires (optional)</label><input id="liExp" type="date"></div>
-        <div class="err" id="liErr"></div>
-        <button class="btn primary" id="liGo">Generate key</button>
-        <div id="liOut" style="margin-top:14px"></div>
-      </div></div>`;
-      $("#liGo").onclick = async ()=>{
-        const err=$("#liErr"); err.classList.remove("show");
-        const body={ licensee:$("#liName").value.trim(), plan:$("#liPlan").value, expires_at:$("#liExp").value||null };
-        if(!body.licensee){ err.textContent="Enter the licensee name."; err.classList.add("show"); return; }
-        try{ const l = await api("/api/central/licenses",{method:"POST",body});
-          $("#liOut").innerHTML = `<div class="panel-b" style="background:var(--green-wash);border-radius:10px">Key issued: <span class="key">${esc(l.key)}</span><div class="hint" style="margin-top:6px">Give this to the customer, then use “Provision school”.</div></div>`;
-          toast("License issued");
-        }catch(e){ err.textContent=e.message; err.classList.add("show"); }
-      };
-    },
-    async provision(){
-      view().innerHTML = `<div class="panel" style="max-width:560px"><div class="panel-h"><h3>Provision a school</h3></div><div class="panel-b">
-        <div class="row"><div><label>School ID (slug)</label><input id="pId" placeholder="e.g. sunrise"></div><div><label>School name</label><input id="pName" placeholder="Sunrise Academy"></div></div>
-        <div class="field"><label>License key</label><input id="pKey" placeholder="CHEN-XXXX-XXXX-XXXX"></div>
-        <div class="row"><div><label>Admin name</label><input id="pAName"></div><div><label>Admin email</label><input id="pAEmail" type="email"></div></div>
-        <div class="field"><label>Admin password</label><input id="pAPass" type="password" placeholder="min 8 chars"></div>
-        <div class="err" id="pErr"></div>
-        <button class="btn primary" id="pGo">Provision</button>
-      </div></div>`;
-      $("#pGo").onclick = async ()=>{
-        const err=$("#pErr"); err.classList.remove("show");
-        const body={ id:$("#pId").value.trim(), name:$("#pName").value.trim(), license_key:$("#pKey").value.trim(),
-          admin_name:$("#pAName").value.trim(), admin_email:$("#pAEmail").value.trim(), admin_password:$("#pAPass").value };
-        try{ await api("/api/central/schools",{method:"POST",body}); toast("School provisioned"); S.view="schools"; save(); renderApp(); }
-        catch(e){ err.textContent=e.message; err.classList.add("show"); }
-      };
-    },
+  SCHOOL.library = async (v) => {
+    const st = vs("library", { tab:"books", q:"", loans:"issued", page:1 });
+    v.innerHTML = `<div class="toolbar">${seg("tab", [["books","Books"],["loans","Loans"]], st.tab)}
+      ${st.tab==="books" ? `<input type="search" id="q" placeholder="Title, author or ISBN…" value="${esc(st.q)}" aria-label="Search books"><div class="sp"></div><button class="btn primary" id="add">${svg(I.plus)} Add book</button>`
+                         : `${seg("ln", [["issued","On loan"],["overdue","Overdue"],["returned","Returned"],["","All"]], st.loans)}<div class="sp"></div>`}</div>
+      <div class="panel" id="list"><div class="empty">Loading…</div></div>`;
+    bindSeg("tab", t => { st.tab = t; st.page = 1; SCHOOL.library(v); });
+    if (st.tab === "loans") {
+      bindSeg("ln", s => { st.loans = s; st.page = 1; SCHOOL.library(v); });
+      const d = await api("/api/book-issues", { query:{ status:st.loans, page:st.page } });
+      $("#list").innerHTML = table([
+        { h:"Book", f:i => `<b>${esc(i.book ? i.book.title : "—")}</b>` }, { h:"Borrower", f:i => esc(i.borrower) },
+        { h:"Issued", f:i => fdate(i.issued_on) }, { h:"Due", f:i => fdate(i.due_on) },
+        { h:"Status", f:i => i.is_overdue ? pill("overdue") : pill(i.status) },
+        { h:"", cls:"right", f:i => i.status !== "returned" ? `<button class="btn sm primary" data-ret="${i.id}">Mark returned</button>` : `<span class="small muted">${fdate(i.returned_on)}</span>` },
+      ], d.data, "No loans here.") + pager(d, p => { st.page = p; SCHOOL.library(v); });
+      $$("[data-ret]", v).forEach(b => b.onclick = guarded(async () => { await api(`/api/book-issues/${b.dataset.ret}/return`, { method:"POST" }); toast("Book returned"); SCHOOL.library(v); }));
+      return;
+    }
+    const load = guarded(async () => {
+      const d = await api("/api/books", { query:{ search:st.q, page:st.page } });
+      $("#list").innerHTML = table([
+        { h:"Title", f:b => `<b>${esc(b.title)}</b>` }, { h:"Author", f:b => esc(b.author || "—") }, { h:"Category", f:b => esc(b.category || "—") },
+        { h:"ISBN", f:b => `<span class="mono small">${esc(b.isbn || "—")}</span>` },
+        { h:"Available", f:b => `<b style="color:${b.available_copies ? "var(--green)" : "var(--red)"}">${b.available_copies}</b> / ${b.total_copies}` },
+        { h:"", cls:"right", f:b => `<div class="acts">${b.available_copies ? `<button class="btn sm primary" data-a="issue" data-id="${b.id}">Issue</button>` : ""}<button class="btn sm" data-a="edit" data-id="${b.id}">Edit</button><button class="btn sm danger" data-a="del" data-id="${b.id}">Delete</button></div>` },
+      ], d.data, st.q ? "No books match." : "No books catalogued yet.") + pager(d, p => { st.page = p; load(); });
+      $$("[data-a]", v).forEach(btn => { const b = d.data.find(x => x.id == btn.dataset.id); btn.onclick = {
+        issue: () => form({ title:`Issue “${b.title}”`, values:{ due_on: addDays(14) }, submit:"Issue book", fields:[
+          { k:"borrower", label:"Borrower", required:true, placeholder:"Student or staff name" }, { k:"due_on", label:"Due back", type:"date", min: today() },
+        ], onSubmit: async val => { await api(`/api/books/${b.id}/issue`, { method:"POST", body: val }); toast("Book issued"); load(); } }),
+        edit: () => edit(b),
+        del: guarded(async () => { if (await confirmDelete(`“${b.title}”`)) { await api("/api/books/"+b.id, { method:"DELETE" }); toast("Book removed"); load(); } }),
+      }[btn.dataset.a]; });
+    });
+    const edit = (b) => form({ title: b ? "Edit book" : "Add book", values: b || { total_copies:1 }, submit: b ? "Save" : "Add book", fields:[
+      { k:"title", label:"Title", required:true, full:true }, { k:"author", label:"Author" }, { k:"category", label:"Category", list:["Textbook","Reference","Literature","Science","Biography","Fiction"] },
+      { k:"isbn", label:"ISBN" }, { k:"total_copies", label:"Total copies", type:"number", min:1, required:true },
+    ], onSubmit: async val => { await api(b ? "/api/books/"+b.id : "/api/books", { method: b ? "PUT" : "POST", body: val }); toast(b ? "Book updated" : "Book added"); load(); } });
+    $("#q").addEventListener("input", debounce(() => { st.q = $("#q").value.trim(); st.page = 1; load(); }, 250));
+    $("#add").onclick = () => edit(null);
+    await load();
   };
 
-  // ---- helpers ----
-  function kpi(cap,val){ return `<div class="kpi"><div class="cap">${esc(cap)}</div><div class="num">${esc(val)}</div></div>`; }
-  function num(n){ return Number(n||0).toLocaleString("en-IN"); }
+  SCHOOL.transport = async (v) => {
+    const st = vs("transport", { sel:null });
+    const admin = can("admin"), driver = can("admin","driver");
+    const render = async () => {
+      const list = await api("/api/vehicles");
+      if (!v.isConnected) return;
+      const sel = list.find(x => x.id === st.sel && x.lat) || list.find(x => x.lat);
+      const live = list.filter(x => x.status === "on_route").length;
+      v.innerHTML = `<div class="kpis">${kpi("Buses", list.length)}${kpi("On route", live)}${kpi("Seats", num(list.reduce((a,x)=>a+(x.capacity||0),0)))}</div>
+        <div class="toolbar"><span class="small muted">Live positions refresh every 30 seconds.</span><div class="sp"></div>${admin ? `<button class="btn primary" id="add">${svg(I.plus)} Add bus</button>` : ""}</div>
+        ${sel ? `<div class="panel"><div class="panel-h"><h3>${esc(sel.bus_no)} · ${esc(sel.route_name||"")}</h3><div class="sp"></div><span class="small muted">updated ${ago(sel.last_ping)}</span>
+            <a class="btn sm" target="_blank" rel="noopener" href="https://www.openstreetmap.org/?mlat=${sel.lat}&mlon=${sel.lng}#map=16/${sel.lat}/${sel.lng}">Open full map</a></div>
+          <iframe class="map" title="Map showing ${esc(sel.bus_no)}" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=${sel.lng-0.01},${sel.lat-0.006},${sel.lng+0.01},${sel.lat+0.006}&layer=mapnik&marker=${sel.lat},${sel.lng}"></iframe></div>` : ""}
+        <div class="cards">${list.map(x => `<div class="card"><div style="display:flex;justify-content:space-between;gap:8px"><h4>${esc(x.bus_no)}</h4>${pill(x.status)}</div>
+          <div class="meta">${esc(x.route_name||"No route")} · Driver ${esc(x.driver||"—")}</div>
+          <div class="meta">${x.capacity} seats · ${x.status==="on_route" ? `${x.speed_kph} km/h · ` : ""}last ping ${ago(x.last_ping)}</div>
+          <div class="acts">${x.lat ? `<button class="btn sm" data-a="map" data-id="${x.id}">Show on map</button>` : ""}
+            ${driver ? `<button class="btn sm primary" data-a="ping" data-id="${x.id}">Share my location</button>` : ""}
+            ${admin ? `<button class="btn sm" data-a="edit" data-id="${x.id}">Edit</button><button class="btn sm danger" data-a="del" data-id="${x.id}">Delete</button>` : ""}</div></div>`).join("") || `<div class="empty">No buses added yet.</div>`}</div>`;
+      if ($("#add")) $("#add").onclick = () => edit(null);
+      $$("[data-a]", v).forEach(b => { const x = list.find(y => y.id == b.dataset.id); b.onclick = {
+        map: () => { st.sel = x.id; render(); },
+        ping: () => {
+          if (!navigator.geolocation) return toast("This device cannot share location.");
+          b.disabled = true; b.textContent = "Locating…";
+          navigator.geolocation.getCurrentPosition(guarded(async pos => {
+            await api(`/api/vehicles/${x.id}/location`, { method:"POST", body:{ lat: pos.coords.latitude, lng: pos.coords.longitude, speed_kph: Math.max(0, (pos.coords.speed||0) * 3.6) } });
+            toast("Location shared"); st.sel = x.id; render();
+          }), err => { toast("Location permission denied or unavailable."); b.disabled = false; b.textContent = "Share my location"; }, { enableHighAccuracy:true, timeout:15000 });
+        },
+        edit: () => edit(x),
+        del: guarded(async () => { if (await confirmDelete(`bus ${x.bus_no}`)) { await api("/api/vehicles/"+x.id, { method:"DELETE" }); toast("Bus removed"); render(); } }),
+      }[b.dataset.a]; });
+    };
+    const edit = (x) => form({ title: x ? `Edit ${x.bus_no}` : "Add bus", values: x || { capacity:40, status:"idle" }, submit: x ? "Save" : "Add bus", fields:[
+      { k:"bus_no", label:"Registration no.", required:true, placeholder:"TN-47-AB-1201" }, { k:"route_name", label:"Route" },
+      { k:"driver", label:"Driver" }, { k:"capacity", label:"Seats", type:"number", min:1 },
+      { k:"status", label:"Status", type:"select", options:[["idle","Idle"],["on_route","On route"],["maintenance","Maintenance"]] },
+    ], onSubmit: async val => { await api(x ? "/api/vehicles/"+x.id : "/api/vehicles", { method: x ? "PUT" : "POST", body: val }); toast("Saved"); render(); } });
+    await render();
+    refreshTimer = setInterval(() => { if (!$("#modalRoot").children.length) render().catch(()=>{}); }, 30000);
+  };
+
+  SCHOOL.hostel = async (v) => {
+    const admin = can("admin");
+    const rooms = await api("/api/rooms");
+    const beds = rooms.reduce((a,r)=>a+r.capacity,0), occ = rooms.reduce((a,r)=>a+r.occupied,0);
+    v.innerHTML = `<div class="kpis">${kpi("Rooms", rooms.length)}${kpi("Beds", beds)}${kpi("Occupied", occ, pct(occ,beds)+"% full")}${kpi("Free beds", beds-occ)}</div>
+      <div class="toolbar"><div class="sp"></div>${admin ? `<button class="btn primary" id="add">${svg(I.plus)} Add room</button>` : ""}</div>
+      <div class="cards">${rooms.map(r => { const p = pct(r.occupied, r.capacity); return `<div class="card">
+        <div style="display:flex;justify-content:space-between"><h4>Block ${esc(r.block)} · ${esc(r.room_no)}</h4><b>${r.occupied}/${r.capacity}</b></div>
+        <div class="meta">Warden: ${esc(r.warden || "—")}</div>${bar(p, p>=100?"bad":p>=75?"warn":"ok")}
+        ${admin ? `<div class="acts"><button class="btn sm primary" data-a="allot" data-id="${r.id}" ${r.occupied>=r.capacity?"disabled":""}>+ Allot bed</button><button class="btn sm" data-a="vacate" data-id="${r.id}" ${r.occupied<1?"disabled":""}>− Vacate</button><button class="btn sm" data-a="edit" data-id="${r.id}">Edit</button><button class="btn sm danger" data-a="del" data-id="${r.id}">Delete</button></div>` : ""}
+      </div>`; }).join("") || `<div class="empty">No hostel rooms yet.</div>`}</div>`;
+    const edit = (r) => form({ title: r ? "Edit room" : "Add room", values: r || { capacity:2 }, submit: r ? "Save" : "Add room", fields:[
+      { k:"block", label:"Block", required:true }, { k:"room_no", label:"Room no.", required:true },
+      { k:"capacity", label:"Beds", type:"number", min:1, required:true }, { k:"warden", label:"Warden" },
+    ], onSubmit: async val => { await api(r ? "/api/rooms/"+r.id : "/api/rooms", { method: r ? "PUT" : "POST", body: val }); toast("Saved"); SCHOOL.hostel(v); } });
+    if ($("#add")) $("#add").onclick = () => edit(null);
+    $$("[data-a]", v).forEach(b => { const r = rooms.find(x => x.id == b.dataset.id); b.onclick = {
+      allot: guarded(async () => { await api(`/api/rooms/${r.id}/allot`, { method:"POST" }); SCHOOL.hostel(v); }),
+      vacate: guarded(async () => { await api(`/api/rooms/${r.id}/vacate`, { method:"POST" }); SCHOOL.hostel(v); }),
+      edit: () => edit(r),
+      del: guarded(async () => { if (await confirmDelete(`room ${r.block}-${r.room_no}`)) { await api("/api/rooms/"+r.id, { method:"DELETE" }); toast("Room removed"); SCHOOL.hostel(v); } }),
+    }[b.dataset.a]; });
+  };
+
+  SCHOOL.communication = async (v) => {
+    const st = vs("communication", { page:1 });
+    const compose = can("admin","teacher"), admin = can("admin");
+    const d = await api("/api/announcements", { query:{ page: st.page } });
+    v.innerHTML = `<div class="toolbar"><span class="small muted">${compose ? "Announcements appear here for everyone in the school." : "Messages from your school."}</span><div class="sp"></div>
+        ${compose ? `<button class="btn primary" id="add">${svg(I.plus)} New announcement</button>` : ""}</div>
+      <div class="panel"><div class="panel-b list">${d.data.map(a => `<div class="it" style="display:flex;gap:12px;align-items:flex-start">
+        <div style="flex:1;min-width:0"><b>${esc(a.title)}</b><div style="white-space:pre-wrap;margin:4px 0 6px">${esc(a.body)}</div>
+        <span class="small muted">${pill(a.status)} ${esc(a.channel)} → ${esc(a.audience)}${a.recipients ? ` · ${num(a.recipients)} recipients` : ""} · ${ago(a.sent_at || a.created_at)}</span></div>
+        ${admin ? `<div class="acts" style="display:flex;gap:6px">${a.status==="draft" ? `<button class="btn sm primary" data-send="${a.id}">Send</button>` : ""}<button class="btn sm danger" data-del="${a.id}">Delete</button></div>` : ""}</div>`).join("") || `<div class="empty">No announcements yet.</div>`}</div>
+        ${pager(d, p => { st.page = p; SCHOOL.communication(v); })}</div>`;
+    if ($("#add")) $("#add").onclick = () => form({ title:"New announcement", wide:true, values:{ channel:"push", audience:"parents" },
+      actions:[{ name:"draft", label:"Save as draft" }, { name:"send", label:"Send now", kind:"primary" }], fields:[
+        { k:"title", label:"Title", required:true, full:true }, { k:"body", label:"Message", type:"textarea", required:true },
+        { k:"channel", label:"Channel", type:"select", options:[["push","App notification"],["sms","SMS"],["email","E-mail"]] },
+        { k:"audience", label:"Send to", type:"select", options:[["parents","Parents"],["staff","Staff"],["all","Everyone"],["class","A class"]] },
+      ], onSubmit: async (val, action) => {
+        await api(action === "send" ? "/api/announcements/send" : "/api/announcements", { method:"POST", body: val });
+        toast(action === "send" ? "Announcement sent" : "Draft saved"); SCHOOL.communication(v);
+      } });
+    $$("[data-send]", v).forEach(b => b.onclick = guarded(async () => { const a = d.data.find(x => x.id == b.dataset.send);
+      await api("/api/announcements/send", { method:"POST", body:{ title:a.title, body:a.body, channel:a.channel, audience:a.audience } });
+      await api("/api/announcements/"+a.id, { method:"DELETE" }); toast("Announcement sent"); SCHOOL.communication(v); }));
+    $$("[data-del]", v).forEach(b => b.onclick = guarded(async () => { if (await confirmDelete("this announcement")) { await api("/api/announcements/"+b.dataset.del, { method:"DELETE" }); toast("Deleted"); SCHOOL.communication(v); } }));
+  };
+
+  SCHOOL.reports = async (v) => {
+    const r = await api("/api/reports/summary");
+    const f = r.fees, a = r.attendance, ac = r.academics;
+    const hbars = (obj, fmt) => { const e = Object.entries(obj||{}); const max = Math.max(1, ...e.map(x=>+x[1])); return e.length ? `<div class="hbars">${e.map(([k,val]) => `<div class="hb"><span>${esc(k||"—")}</span>${bar(pct(val,max))}<b class="right">${fmt?fmt(val):num(val)}</b></div>`).join("")}</div>` : `<div class="empty">No data yet.</div>`; };
+    v.innerHTML = `<div class="kpis">
+        ${kpi("Billed", money(f.billed), num(f.invoices)+" invoices")}${kpi("Collected", money(f.collected), pct(f.collected,f.billed)+"% collection rate")}
+        ${kpi("Outstanding", money(f.outstanding))}${kpi("Avg attendance", a.average_pct+"%", `${num(a.below_75)} students below 75%`)}
+        ${kpi("Results recorded", num(ac.results_recorded), "top average "+ac.top_average+"%")}
+      </div>
+      <div class="panel"><div class="panel-h"><h3>Download data (Excel-ready CSV)</h3></div><div class="panel-b" style="display:flex;gap:8px;flex-wrap:wrap">
+        ${[["students","Students"],["fees","Fees & payments"],["attendance","Attendance (30 days)"],["results","Exam results"],["staff","Staff"]].map(([k,l]) => `<button class="btn" data-exp="${k}">${esc(l)}</button>`).join("")}
+      </div></div>
+      <div class="grid2">
+        <div class="panel"><div class="panel-h"><h3>Fee collection by class</h3></div>${table([
+          { h:"Class", f:x => esc(x.class_name || "—") }, { h:"Billed", cls:"right", f:x => money(x.billed) }, { h:"Collected", cls:"right", f:x => money(x.collected) },
+          { h:"", f:x => `<span class="minibar"><i style="width:${pct(x.collected,x.billed)}%"></i></span>${pct(x.collected,x.billed)}%` },
+        ], f.by_class, "No invoices yet.")}</div>
+        <div class="panel"><div class="panel-h"><h3>Grade distribution</h3></div><div class="panel-b">${hbars(ac.grades)}</div></div>
+        <div class="panel"><div class="panel-h"><h3>Students per class</h3></div><div class="panel-b">${hbars(r.students.by_class)}</div></div>
+        <div class="panel"><div class="panel-h"><h3>Admissions</h3></div><div class="panel-b">${hbars(r.admissions)}</div></div>
+      </div>`;
+    $$("[data-exp]", v).forEach(b => b.onclick = guarded(async () => { b.disabled = true; try { await download("/api/reports/export/"+b.dataset.exp, b.dataset.exp+"-"+today()+".csv"); } finally { b.disabled = false; } }));
+  };
+
+  SCHOOL.users = async (v) => {
+    const st = vs("users", { q:"", role:"", page:1 });
+    const roleList = (await api("/api/roles")).roles || [];
+    v.innerHTML = `<div class="toolbar"><input type="search" id="q" placeholder="Search name or email…" value="${esc(st.q)}" aria-label="Search users">
+        <select id="role" aria-label="Role">${opts(roleList, st.role, "All roles")}</select><div class="sp"></div>
+        <button class="btn primary" id="add">${svg(I.plus)} Add user</button></div>
+      <div class="note" style="background:var(--primary-wash);color:var(--primary-ink)">Admin: everything · Accountant: fees & reports · Teacher: attendance, exams, library · Driver: bus GPS · Parent/Student: timetable & announcements.</div>
+      <div class="panel" id="list"><div class="empty">Loading…</div></div>`;
+    const load = guarded(async () => {
+      const d = await api("/api/users", { query:{ search:st.q, role:st.role, page:st.page } });
+      $("#list").innerHTML = table([
+        { h:"Name", f:u => `<b>${esc(u.name)}</b>${u.id===S.user.id?' <span class="small muted">(you)</span>':""}` }, { h:"Email", f:u => esc(u.email) }, { h:"Phone", f:u => esc(u.phone || "—") },
+        { h:"Role", f:u => (u.roles||[]).map(r => pill(r==="admin"?"enrolled":"", r)).join(" ") || pill("none","no role") },
+        { h:"", cls:"right", f:u => `<div class="acts"><button class="btn sm" data-edit="${u.id}">Edit</button>${u.id!==S.user.id?`<button class="btn sm danger" data-del="${u.id}">Delete</button>`:""}</div>` },
+      ], d.data, "No users match.") + pager(d, p => { st.page = p; load(); });
+      $$("[data-edit]", v).forEach(b => b.onclick = () => edit(d.data.find(u => u.id == b.dataset.edit)));
+      $$("[data-del]", v).forEach(b => b.onclick = guarded(async () => { const u = d.data.find(x => x.id == b.dataset.del);
+        if (await confirmDelete(`${u.name}'s account`)) { await api("/api/users/"+u.id, { method:"DELETE" }); toast("User deleted"); load(); } }));
+    });
+    const edit = (u) => form({ title: u ? "Edit user" : "Add user", values: u ? { ...u, role:(u.roles||[])[0] } : { role:"teacher" }, submit: u ? "Save" : "Create user", fields:[
+      { k:"name", label:"Full name", required:true }, { k:"email", label:"Email (login)", type:"email", required:true },
+      { k:"phone", label:"Phone", type:"tel" }, { k:"role", label:"Role", type:"select", options:roleList, required:true },
+      { k:"password", label: u ? "New password" : "Password", type:"password", required:!u, full:true, hint: u ? "Leave blank to keep the current password." : "At least 8 characters. Share it with the user securely." },
+    ], onSubmit: async val => { await api(u ? "/api/users/"+u.id : "/api/users", { method: u ? "PUT" : "POST", body: val }); toast(u ? "User updated" : "User created"); load(); } });
+    $("#q").addEventListener("input", debounce(() => { st.q = $("#q").value.trim(); st.page = 1; load(); }, 250));
+    $("#role").onchange = () => { st.role = $("#role").value; st.page = 1; load(); };
+    $("#add").onclick = () => edit(null);
+    await load();
+  };
+
+  SCHOOL.settings = async (v) => {
+    const [s, l] = await Promise.all([api("/api/settings"), api("/api/license")]);
+    const F = [["school_name","School name"],["branch","Branch"],["academic_year","Academic year"],["phone","Phone"],["email","E-mail"],["address","Address"]];
+    v.innerHTML = `<div class="grid2">
+      <form class="panel" id="sf"><div class="panel-h"><h3>School profile</h3></div><div class="panel-b">
+        <p class="small muted" style="margin-top:0">Shown on receipts and in the app header.</p>
+        ${F.map(([k,lb]) => `<div class="field"><label for="s_${k}">${lb}</label><input id="s_${k}" name="${k}" value="${esc(s[k]||"")}"></div>`).join("")}
+        <div class="field"><label for="s_currency">Currency</label><select id="s_currency" name="currency">${opts([["INR","₹ Indian Rupee"],["USD","$ US Dollar"],["AED","AED UAE Dirham"],["GBP","£ Pound"],["EUR","€ Euro"],["LKR","Sri Lankan Rupee"],["NPR","Nepalese Rupee"],["SGD","Singapore Dollar"]], s.currency||"INR")}</select></div>
+        <div class="field"><label for="s_timezone">Time zone</label><select id="s_timezone" name="timezone">${opts([...new Set([s.timezone||"Asia/Kolkata","Asia/Kolkata","Asia/Dubai","Asia/Singapore","Asia/Colombo","Asia/Kathmandu","Asia/Dhaka","Asia/Riyadh","Asia/Kuala_Lumpur","Africa/Nairobi","Europe/London","America/New_York","UTC"])], s.timezone||"Asia/Kolkata")}</select><div class="hint">Decides what “today” means for attendance and due dates.</div></div>
+        <button class="btn primary" type="submit">Save settings</button>
+      </div></form>
+      <div class="panel"><div class="panel-h"><h3>License</h3><div class="sp"></div>${pill(l.status)}</div><div class="panel-b">
+        <table><tbody>
+          <tr><td class="muted">Licensed to</td><td><b>${esc(l.licensee || "—")}</b></td></tr>
+          <tr><td class="muted">Key</td><td><span class="key">${esc(l.key || "—")}</span></td></tr>
+          <tr><td class="muted">Plan</td><td style="text-transform:capitalize">${esc(l.plan || "—")}</td></tr>
+          <tr><td class="muted">Valid until</td><td>${l.expires_at ? fdate(l.expires_at) : "No expiry"}</td></tr>
+          <tr><td class="muted">School ID</td><td class="mono">${esc(S.tenant)}</td></tr>
+        </tbody></table>
+        <p class="small muted">To renew or upgrade, contact ${esc(l.vendor)}.</p>
+      </div></div></div>`;
+    $("#sf").onsubmit = guarded(async (e) => {
+      e.preventDefault();
+      const body = {}; $$("input,select", $("#sf")).forEach(i => body[i.name] = i.value.trim() || null);
+      CFG.settings = await api("/api/settings", { method:"PUT", body:{ settings: body } });
+      toast("Settings saved"); renderApp();
+    });
+  };
+
+  // ================= OWNER (CONTROL PLANE) VIEWS =================
+  const OWNER = {};
+  OWNER.overview = async (v) => {
+    const [o, schools] = await Promise.all([api("/api/central/overview"), api("/api/central/schools")]);
+    v.innerHTML = `${S.user && S.user.must_change_password ? `<div class="note">You are using the default owner password. <a href="#" id="chpw">Change it now</a> before going live.</div>` : ""}
+      <div class="kpis">${kpi("Schools", num(o.schools_total), `${num(o.schools_active)} active`)}${kpi("Suspended", num(o.schools_suspended))}
+        ${kpi("Licenses", num(o.licenses_total), `${num(o.licenses_unused)} unused`)}${kpi("Expiring ≤ 30 days", num(o.licenses_expiring))}</div>
+      <div class="grid2"><div class="panel"><div class="panel-h"><h3>Newest schools</h3><div class="sp"></div><button class="btn sm" data-go="schools">All schools</button></div>
+        ${table([{ h:"School", f:t => `<b>${esc(t.name)}</b><div class="small muted mono">${esc(t.id)}</div>` }, { h:"Plan", f:t => esc(t.plan) }, { h:"License", f:t => pill(t.license_status) }], schools.slice(0,6), "No schools yet.")}</div>
+        <div class="panel"><div class="panel-h"><h3>Plans</h3></div><div class="panel-b">${Object.keys(o.plans||{}).length ? `<div class="hbars">${Object.entries(o.plans).map(([k,n]) => `<div class="hb"><span style="text-transform:capitalize">${esc(k)}</span>${bar(pct(n,o.schools_total))}<b class="right">${n}</b></div>`).join("")}</div>` : `<div class="empty">No schools yet.</div>`}
+          <div style="display:flex;gap:8px;margin-top:14px"><button class="btn primary" data-go="issue">Issue a license</button><button class="btn" data-go="provision">Provision a school</button></div></div></div></div>`;
+    if ($("#chpw")) $("#chpw").onclick = (e) => { e.preventDefault(); changePassword(); };
+    $$("[data-go]", v).forEach(b => b.onclick = () => go(b.dataset.go));
+  };
+  OWNER.schools = async (v) => {
+    const st = vs("schools", { q:"" });
+    const list = await api("/api/central/schools");
+    const draw = () => {
+      const rows = list.filter(t => !st.q || (t.id+" "+t.name+" "+(t.licensee||"")).toLowerCase().includes(st.q.toLowerCase()));
+      $("#list").innerHTML = table([
+        { h:"School ID", f:t => `<span class="key">${esc(t.id)}</span>` }, { h:"Name", f:t => `<b>${esc(t.name)}</b><div class="small muted">${esc(t.licensee||"")}</div>` },
+        { h:"Plan", f:t => `<span style="text-transform:capitalize">${esc(t.plan)}</span>` }, { h:"License", f:t => pill(t.license_status) },
+        { h:"Expires", f:t => t.license_expires_at ? fdate(t.license_expires_at) : "—" }, { h:"Since", f:t => fdate(t.created_at) },
+        { h:"", cls:"right", f:t => t.license_status==="active" ? `<button class="btn sm danger" data-sus="${esc(t.id)}">Suspend</button>` : `<button class="btn sm" data-act="${esc(t.id)}">Re-activate</button>` },
+      ], rows, list.length ? "No schools match." : "No schools yet — provision one.");
+      $$("[data-sus]", v).forEach(b => b.onclick = guarded(async () => { if (await confirmBox(`Suspend ${b.dataset.sus}? All its users are blocked immediately.`, "Suspend school")) { await api(`/api/central/schools/${b.dataset.sus}/suspend`, { method:"POST" }); toast("School suspended"); OWNER.schools(v); } }));
+      $$("[data-act]", v).forEach(b => b.onclick = guarded(async () => { await api(`/api/central/schools/${b.dataset.act}/activate`, { method:"POST" }); toast("School re-activated"); OWNER.schools(v); }));
+    };
+    v.innerHTML = `<div class="toolbar"><input type="search" id="q" placeholder="Search schools…" value="${esc(st.q)}" aria-label="Search schools"><div class="sp"></div><button class="btn primary" data-go="provision">${svg(I.plus)} Provision school</button></div><div class="panel" id="list"></div>`;
+    $("#q").addEventListener("input", () => { st.q = $("#q").value.trim(); draw(); });
+    $("[data-go]", v).onclick = () => go("provision");
+    draw();
+  };
+  OWNER.licenses = async (v) => {
+    const st = vs("licenses", { status:"", q:"", page:1 });
+    v.innerHTML = `<div class="toolbar">${seg("stSeg", [["","All"],["active","Active"],["suspended","Suspended"],["revoked","Revoked"]], st.status)}
+      <input type="search" id="q" placeholder="Key or licensee…" value="${esc(st.q)}" aria-label="Search licenses"><div class="sp"></div><button class="btn primary" data-go="issue">${svg(I.plus)} Issue license</button></div>
+      <div class="panel" id="list"><div class="empty">Loading…</div></div>`;
+    const load = guarded(async () => {
+      const d = await api("/api/central/licenses", { query:{ status:st.status, search:st.q, page:st.page } });
+      $("#list").innerHTML = table([
+        { h:"Key", f:l => `<span class="key">${esc(l.key)}</span> <button class="btn sm ghost" data-copy="${esc(l.key)}" aria-label="Copy key">Copy</button>` },
+        { h:"Licensee", f:l => esc(l.licensee) }, { h:"Plan", f:l => `<span style="text-transform:capitalize">${esc(l.plan)}</span>` },
+        { h:"School", f:l => l.tenant_id ? `<span class="mono">${esc(l.tenant_id)}</span>` : `<span class="muted">unused</span>` },
+        { h:"Status", f:l => pill(l.expires_at && new Date(l.expires_at) < new Date() && l.status==="active" ? "expired" : l.status) },
+        { h:"Expires", f:l => l.expires_at ? fdate(l.expires_at) : "Never" },
+        { h:"", cls:"right", f:l => `<div class="acts">${l.status!=="revoked" ? `<button class="btn sm" data-a="renew" data-id="${l.id}">Renew / plan</button>` : ""}
+          ${l.status==="active" ? `<button class="btn sm danger" data-a="suspend" data-id="${l.id}">Suspend</button>` : l.status==="suspended" ? `<button class="btn sm" data-a="activate" data-id="${l.id}">Activate</button>` : ""}
+          ${l.status!=="revoked" ? `<button class="btn sm danger" data-a="revoke" data-id="${l.id}">Revoke</button>` : ""}
+          ${!l.tenant_id && l.status==="active" ? `<button class="btn sm primary" data-a="use" data-id="${l.id}">Provision</button>` : ""}</div>` },
+      ], d.data, "No licenses here.") + pager(d, p => { st.page = p; load(); });
+      $$("[data-copy]", v).forEach(b => b.onclick = () => { navigator.clipboard && navigator.clipboard.writeText(b.dataset.copy).then(() => toast("Key copied")); });
+      $$("[data-a]", v).forEach(b => { const l = d.data.find(x => x.id == b.dataset.id); b.onclick = {
+        renew: () => form({ title:`Renew ${l.key}`, values:{ ...l, expires_at: l.expires_at ? String(l.expires_at).slice(0,10) : "" }, submit:"Save", fields:[
+          { k:"licensee", label:"Licensee", required:true, full:true }, { k:"plan", label:"Plan", type:"select", options:[["starter","Starter"],["pro","Pro"],["enterprise","Enterprise"]] },
+          { k:"expires_at", label:"Valid until", type:"date", hint:"Leave blank for no expiry." },
+        ], onSubmit: async val => { await api("/api/central/licenses/"+l.id, { method:"PUT", body: val }); toast("License updated"); load(); } }),
+        suspend: guarded(async () => { await api(`/api/central/licenses/${l.id}/suspend`, { method:"POST" }); toast("License suspended"); load(); }),
+        activate: guarded(async () => { await api(`/api/central/licenses/${l.id}/activate`, { method:"POST" }); toast("License activated"); load(); }),
+        revoke: guarded(async () => { if (await confirmBox(`Revoke ${l.key}? This is permanent${l.tenant_id ? " and blocks school "+l.tenant_id : ""}.`, "Revoke key")) { await api(`/api/central/licenses/${l.id}/revoke`, { method:"POST" }); toast("License revoked"); load(); } }),
+        use: () => { VS.provisionKey = l.key; go("provision"); },
+      }[b.dataset.a]; });
+    });
+    bindSeg("stSeg", s => { st.status = s; st.page = 1; OWNER.licenses(v); });
+    $("#q").addEventListener("input", debounce(() => { st.q = $("#q").value.trim(); st.page = 1; load(); }, 250));
+    $("[data-go]", v).onclick = () => go("issue");
+    await load();
+  };
+  OWNER.issue = async (v) => {
+    v.innerHTML = `<form class="panel" style="max-width:560px" id="lf" novalidate><div class="panel-h"><h3>Issue a license key</h3></div><div class="panel-b">
+      <div class="err" id="lErr" role="alert"></div>
+      <div class="field"><label for="liName">Licensee (customer / school organisation)</label><input id="liName" placeholder="e.g. Sunrise Academy Trust"></div>
+      <div class="row"><div class="field"><label for="liPlan">Plan</label><select id="liPlan"><option value="starter">Starter</option><option value="pro" selected>Pro</option><option value="enterprise">Enterprise</option></select></div>
+        <div class="field"><label for="liExp">Valid until</label><input id="liExp" type="date" min="${addDays(1)}" value="${addDays(365)}"><div class="hint">Clear for a perpetual license.</div></div></div>
+      <button class="btn primary" type="submit">Generate key</button><div id="liOut" style="margin-top:14px"></div></div></form>`;
+    $("#lf").onsubmit = async (e) => {
+      e.preventDefault(); const err = $("#lErr"); err.classList.remove("show");
+      const body = { licensee: $("#liName").value.trim(), plan: $("#liPlan").value, expires_at: $("#liExp").value || null };
+      if (!body.licensee) { err.textContent = "Enter the licensee name."; err.classList.add("show"); return; }
+      try { const l = await api("/api/central/licenses", { method:"POST", body });
+        $("#liOut").innerHTML = `<div class="panel-b" style="background:var(--green-wash);border-radius:12px">Key issued: <span class="key">${esc(l.key)}</span>
+          <div style="display:flex;gap:8px;margin-top:10px"><button type="button" class="btn sm" id="cp">Copy key</button><button type="button" class="btn sm primary" id="pv">Provision a school with it</button></div></div>`;
+        $("#cp").onclick = () => navigator.clipboard && navigator.clipboard.writeText(l.key).then(() => toast("Key copied"));
+        $("#pv").onclick = () => { VS.provisionKey = l.key; go("provision"); };
+        toast("License issued");
+      } catch(e){ if(!e.handled){ err.textContent = e.message; err.classList.add("show"); } }
+    };
+    $("#liName").focus();
+  };
+  OWNER.provision = async (v) => {
+    const keys = (await api("/api/central/licenses", { query:{ status:"active", unassigned:1, per_page:100 } })).data || [];
+    const pre = VS.provisionKey || ""; VS.provisionKey = "";
+    const gen = () => Array.from(crypto.getRandomValues(new Uint8Array(9)), b => "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"[b % 56]).join("");
+    v.innerHTML = `<form class="panel" style="max-width:640px" id="pf" novalidate><div class="panel-h"><h3>Provision a new school</h3></div><div class="panel-b">
+      <p class="small muted" style="margin-top:0">Creates the school's own isolated database, its roles, and the first admin account.</p>
+      <div class="err" id="pErr" role="alert"></div>
+      <div class="field"><label for="pKey">License key</label>${keys.length || pre ? `<select id="pKey">${opts([...new Set([pre, ...keys.map(k=>k.key)].filter(Boolean))].map(k => { const l = keys.find(x=>x.key===k); return [k, l ? `${k} — ${l.licensee} (${l.plan})` : k]; }), pre)}</select>` : `<input id="pKey" placeholder="CHEN-XXXX-XXXX-XXXX"><div class="hint">No unused keys — <a href="#" id="toIssue">issue one first</a>.</div>`}</div>
+      <div class="row"><div class="field"><label for="pName">School name</label><input id="pName" placeholder="Sunrise Academy"></div>
+        <div class="field"><label for="pId">School ID (login code)</label><input id="pId" placeholder="sunrise" autocapitalize="none"><div class="hint">Lowercase letters, numbers, dashes. Staff type this to sign in.</div></div></div>
+      <div class="row"><div class="field"><label for="pAName">Admin name</label><input id="pAName"></div><div class="field"><label for="pAEmail">Admin email</label><input id="pAEmail" type="email"></div></div>
+      <div class="field"><label for="pAPass">Admin password</label><div style="display:flex;gap:8px"><input id="pAPass" value="${gen()}" autocomplete="off"><button type="button" class="btn" id="genPw">New</button></div><div class="hint">Share with the school admin securely; they can change it after signing in.</div></div>
+      <button class="btn primary" type="submit" id="pGo">Provision school</button><div id="pOut" style="margin-top:14px"></div></div></form>`;
+    let idTouched = false;
+    $("#pId").addEventListener("input", () => idTouched = true);
+    $("#pName").addEventListener("input", () => { if (!idTouched) $("#pId").value = $("#pName").value.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,30); });
+    $("#genPw").onclick = () => $("#pAPass").value = gen();
+    if ($("#toIssue")) $("#toIssue").onclick = (e) => { e.preventDefault(); go("issue"); };
+    $("#pf").onsubmit = async (e) => {
+      e.preventDefault(); const err = $("#pErr"); err.classList.remove("show");
+      const body = { license_key: $("#pKey").value.trim(), name: $("#pName").value.trim(), id: $("#pId").value.trim(),
+        admin_name: $("#pAName").value.trim(), admin_email: $("#pAEmail").value.trim(), admin_password: $("#pAPass").value };
+      const missing = Object.entries(body).filter(([,x]) => !x).map(([k]) => k.replace(/_/g," "));
+      if (missing.length) { err.textContent = "Please fill in: " + missing.join(", "); err.classList.add("show"); return; }
+      const btn = $("#pGo"); btn.disabled = true; btn.textContent = "Creating school database…";
+      try {
+        await api("/api/central/schools", { method:"POST", body });
+        const handover = `Scholar ERP — your school is ready\nServer: ${S.base}\nSchool ID: ${body.id}\nAdmin email: ${body.admin_email}\nPassword: ${body.admin_password}\n(Please change the password after first sign-in.)`;
+        $("#pOut").innerHTML = `<div class="panel-b" style="background:var(--green-wash);border-radius:12px"><b>School provisioned.</b> Hand-over details:
+          <pre class="mono small" style="white-space:pre-wrap;margin:10px 0">${esc(handover)}</pre><button type="button" class="btn sm" id="cpH">Copy hand-over note</button> <button type="button" class="btn sm" id="toSchools">View schools</button></div>`;
+        $("#cpH").onclick = () => navigator.clipboard && navigator.clipboard.writeText(handover).then(() => toast("Copied"));
+        $("#toSchools").onclick = () => go("schools");
+        toast("School provisioned"); btn.textContent = "Provisioned ✓";
+      } catch(e){ btn.disabled = false; btn.textContent = "Provision school"; if(!e.handled){ err.textContent = e.message; err.classList.add("show"); } }
+    };
+  };
 
   // ---- boot ----
-  if(S.token && S.mode) renderApp(); else renderLogin();
+  if (S.token && S.mode) renderApp(); else renderLogin();
 })();
 </script>
 </body>

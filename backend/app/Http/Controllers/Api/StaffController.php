@@ -12,24 +12,17 @@ class StaffController extends Controller
     {
         $query = StaffMember::query();
         if ($search = $request->query('search')) {
-            $query->where('name', 'like', "%{$search}%");
+            $query->where(fn ($w) => $w->where('name', 'like', "%{$search}%")->orWhere('role', 'like', "%{$search}%"));
         }
         if ($dept = $request->query('department')) {
             $query->where('department', $dept);
         }
-        return $query->orderBy('name')->paginate($request->integer('per_page', 25));
+        return $query->orderBy('name')->paginate($this->perPage($request));
     }
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name'       => ['required', 'string'],
-            'role'       => ['required', 'string'],
-            'department' => ['nullable', 'string'],
-            'status'     => ['nullable', 'in:present,absent,leave'],
-            'email'      => ['nullable', 'email'],
-            'phone'      => ['nullable', 'string'],
-        ]);
+        $data = $request->validate($this->rules('required'));
         return response()->json(StaffMember::create($data), 201);
     }
 
@@ -40,14 +33,7 @@ class StaffController extends Controller
 
     public function update(Request $request, StaffMember $staff)
     {
-        $data = $request->validate([
-            'name'       => ['sometimes', 'string'],
-            'role'       => ['sometimes', 'string'],
-            'department' => ['nullable', 'string'],
-            'status'     => ['sometimes', 'in:present,absent,leave'],
-            'email'      => ['nullable', 'email'],
-            'phone'      => ['nullable', 'string'],
-        ]);
+        $data = $request->validate($this->rules('sometimes'));
         $staff->update($data);
         return response()->json($staff);
     }
@@ -56,5 +42,17 @@ class StaffController extends Controller
     {
         $staff->delete();
         return response()->noContent();
+    }
+
+    private function rules(string $presence): array
+    {
+        return [
+            'name'       => [$presence, 'string', 'max:120'],
+            'role'       => [$presence, 'string', 'max:120'],
+            'department' => ['nullable', 'string', 'max:60'],
+            'status'     => ['sometimes', 'in:present,absent,leave'],
+            'email'      => ['nullable', 'email'],
+            'phone'      => ['nullable', 'string', 'max:20'],
+        ];
     }
 }

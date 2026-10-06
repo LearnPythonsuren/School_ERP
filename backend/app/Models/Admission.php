@@ -21,7 +21,7 @@ class Admission extends Model
     protected function casts(): array
     {
         return [
-            'applied_on' => 'date',
+            'applied_on' => 'date:Y-m-d',
         ];
     }
 

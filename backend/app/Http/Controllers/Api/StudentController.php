@@ -14,14 +14,17 @@ class StudentController extends Controller
     {
         $query = Student::query();
         if ($search = $request->query('search')) {
-            $query->where('name', 'like', "%{$search}%");
+            $query->where(fn ($w) => $w->where('name', 'like', "%{$search}%")->orWhere('guardian_phone', 'like', "%{$search}%"));
         }
         if ($class = $request->query('class')) {
             $query->where('class_name', $class);
         }
+        if ($fee = $request->query('fee_status')) {
+            $query->where('fee_status', $fee);
+        }
         return StudentResource::collection(
-            $query->orderBy('name')->paginate($request->integer('per_page', 25))
-        );
+            $query->orderBy('class_name')->orderBy('roll_no')->orderBy('name')->paginate($this->perPage($request))
+        )->additional(['classes' => Student::distinct()->orderBy('class_name')->pluck('class_name')]);
     }
 
     public function store(StoreStudentRequest $request)

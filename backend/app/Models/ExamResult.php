@@ -31,6 +31,19 @@ class ExamResult extends Model
         return (int) round(($this->maths + $this->science + $this->english) / 3);
     }
 
+    /** Default grading scale; schools can still send their own grade. */
+    public static function gradeFor(int $average): string
+    {
+        return match (true) {
+            $average >= 90 => 'A+',
+            $average >= 75 => 'A',
+            $average >= 60 => 'B',
+            $average >= 45 => 'C',
+            $average >= 33 => 'D',
+            default        => 'F',
+        };
+    }
+
     public function student(): BelongsTo
     {
         return $this->belongsTo(Student::class);

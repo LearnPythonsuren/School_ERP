@@ -11,18 +11,13 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    /** Login — blocked if the school's license (from Chenthur Info Tech) is inactive. */
+    /** Login. The school's license is checked by EnsureLicenseActive before this runs. */
     public function login(Request $request): JsonResponse
     {
         $data = $request->validate([
             'email'    => ['required', 'email'],
             'password' => ['required', 'string'],
         ]);
-
-        $tenant = tenant();
-        if ($tenant && ! $tenant->licenseIsActive()) {
-            abort(403, "This school's license is not active. Please contact Chenthur Info Tech.");
-        }
 
         $user = User::where('email', $data['email'])->first();
         if (! $user || ! Hash::check($data['password'], $user->password)) {
@@ -32,7 +27,7 @@ class AuthController extends Controller
         }
 
         return response()->json([
-            'token' => $user->createToken('erp')->plainTextToken,
+            'token' => $user->createToken('erp', ['*'], $this->tokenExpiry())->plainTextToken,
             'user'  => $this->profile($user),
         ]);
     }
@@ -58,7 +53,7 @@ class AuthController extends Controller
     {
         $data = $request->validate([
             'current_password' => ['required', 'string'],
-            'new_password'     => ['required', 'string', 'min:8', 'confirmed'],
+            'new_password'     => ['required', 'string', 'min:8', 'confirmed', 'different:current_password'],
         ]);
         $user = $request->user();
         if (! Hash::check($data['current_password'], $user->password)) {
@@ -72,7 +67,7 @@ class AuthController extends Controller
     private function profile(User $user): array
     {
         return [
-            'id' => $user->id, 'name' => $user->name, 'email' => $user->email,
+            'id' => $user->id, 'name' => $user->name, 'email' => $user->email, 'phone' => $user->phone,
             'roles' => $user->getRoleNames(),
         ];
     }

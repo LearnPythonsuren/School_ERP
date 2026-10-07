@@ -41,6 +41,8 @@ jobs:
       - name: API tests (control plane, every module, roles, live license gate)
         run: |
           cd "$RUNNER_TEMP/app"
+          # Cache like production does — catches anything that only works uncached.
+          php artisan config:cache && php artisan route:cache
           php artisan serve --host=127.0.0.1 --port=8000 </dev/null >/tmp/serve.log 2>&1 &
           for i in $(seq 1 30); do curl -sf http://127.0.0.1:8000/api/health >/dev/null && break; sleep 1; done
           cd "$GITHUB_WORKSPACE"

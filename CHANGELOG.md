@@ -1,5 +1,33 @@
 # Changelog
 
+## 1.2.0 — Windows hosting
+
+### New
+- **Host on Windows with IIS:** `windows\install.ps1` installs (or updates)
+  everything in `C:\ScholarERP`: a private PHP with a production php.ini,
+  Composer, the app in production mode, an IIS site with PHP FastCGI and URL
+  Rewrite, least-privilege folder permissions, a firewall rule and a nightly
+  backup task. Guide: [docs/WINDOWS.md](docs/WINDOWS.md).
+- `windows\connect-domain.ps1`: your domain over HTTPS with Cloudflare Tunnel
+  (no port forwarding or static IP needed).
+- `windows\backup.ps1`: consistent snapshots of every school database plus
+  `.env`, 14 days kept.
+- `setup.sh` options: `SCHOLAR_PRODUCTION=1`, `SCHOLAR_URL`, `SCHOLAR_DEMO=0`.
+- A random owner password is generated on install (readable by
+  Administrators only) instead of the public default.
+
+### Fixes
+- **Every login failed (HTTP 500) once routes were cached** (`route:cache`,
+  recommended for production): the login rate limiter was defined in
+  `routes/api.php`, which a cached app never runs. It now lives in
+  `AppServiceProvider`. CI now caches config and routes before testing.
+- Login rate limiting didn't hold between requests (the cache was
+  per-request). Production installs now use a persistent cache.
+- SQLite: WAL mode and a 10-second lock timeout, so several web workers can
+  write at once without "database is locked" errors.
+- Behind Cloudflare Tunnel or a local proxy, the app now sees the real client
+  IP and HTTPS, trusting forwarded headers only from this machine.
+
 ## 1.1.0 — Production-ready release
 
 Upgrading an existing install: `bash setup.sh --update` (keeps all data,

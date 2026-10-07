@@ -199,7 +199,8 @@
 
   function load(){ try{ return JSON.parse(localStorage.getItem(LS)); }catch(e){ return null; } }
   function save(){ try{ localStorage.setItem(LS, JSON.stringify(S)); }catch(e){} }
-  function defaultBase(){ return (location.protocol.startsWith("http") && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? location.origin : "http://127.0.0.1:8000"); }
+  // Served by Laravel/IIS → the API is on the same address. Opened from disk → assume `php artisan serve`.
+  function defaultBase(){ return location.protocol.startsWith("http") ? location.origin : "http://127.0.0.1:8000"; }
   const isLocal = () => /\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(S.base);
 
   function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2800); }

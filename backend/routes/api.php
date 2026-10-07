@@ -23,14 +23,7 @@ use App\Http\Middleware\EnsureCentralUser;
 use App\Http\Middleware\EnsureLicenseActive;
 use App\Http\Middleware\EnsureRole;
 use App\Http\Middleware\IdentifySchool;
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
-
-// Brute-force guard for both login screens: 10 tries a minute per email + IP
-// (per email, not just IP, so a whole school behind one NAT is not locked out).
-RateLimiter::for('login', fn (Request $r) => Limit::perMinute(10)->by(strtolower((string) $r->input('email')).'|'.$r->ip()));
 
 // Uptime probe for hosting platforms / load balancers.
 Route::get('/health', fn () => response()->json(['status' => 'ok', 'app' => 'Scholar ERP', 'time' => now()->toIso8601String()]));

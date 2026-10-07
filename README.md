@@ -12,7 +12,7 @@ database and runs only while it holds a license key that you issue.
            issue & renew licenses · provision · suspend schools
 ```
 
-Current version: **1.1.0** (see [CHANGELOG.md](CHANGELOG.md)).
+Current version: **1.2.0** (see [CHANGELOG.md](CHANGELOG.md)).
 
 ## What's included
 
@@ -92,12 +92,13 @@ bash test-api.sh
 | `backend/` | Product code overlaid onto a fresh Laravel app (models, controllers, middleware, migrations, seeders, routes). API reference in [backend/README.md](backend/README.md). |
 | `setup.sh` | Fresh install (`bash setup.sh`) or in-place upgrade (`bash setup.sh --update`). |
 | `test-api.sh` | End-to-end API test suite. |
-| `docs/DEPLOYMENT.md` | Putting it on a real server (VPS, MySQL, HTTPS, backups, updates). |
+| `docs/WINDOWS.md` + `windows/` | Hosting on a Windows PC/server with IIS: one-command install, Cloudflare Tunnel for your domain, nightly backups. |
+| `docs/DEPLOYMENT.md` | Putting it on a Linux server (VPS, MySQL, HTTPS, backups, updates). |
 | `.github/workflows/ci.yml` | CI runs `setup.sh`, the full test suite and the upgrade path on every push. |
 
 ## Going live
 
-Follow [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). Before the first customer:
+Windows: [docs/WINDOWS.md](docs/WINDOWS.md). Linux: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). Before the first customer:
 
 1. Set `CENTRAL_ADMIN_EMAIL` / `CENTRAL_ADMIN_PASSWORD` **before** seeding,
    or change the owner password from the console straight after.

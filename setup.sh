@@ -8,6 +8,9 @@
 #   SCHOLAR_APP_DIR=/path bash setup.sh      Choose the install folder.
 #   SCHOLAR_SKIP_INSTALL=1                    Reuse a Laravel app that already has the
 #                                             packages installed (used by CI caching).
+#   SCHOLAR_PRODUCTION=1                      Production .env (no debug pages, file cache).
+#   SCHOLAR_URL=https://erp.example.com       Public address (with SCHOLAR_PRODUCTION).
+#   SCHOLAR_DEMO=0                            Skip the greenfield demo school.
 #
 # Requires PHP 8.2+ and Composer.
 set -euo pipefail
@@ -27,6 +30,9 @@ overlay() {
   cp "$B"/routes/web.php routes/web.php
   cp "$B"/routes/tenant.php routes/tenant.php
   cp "$DIR"/frontend/app.html public/app.html   # served at /app.html, same origin as the API
+  # Behind a local reverse proxy / Cloudflare Tunnel, take the client IP and https
+  # scheme from X-Forwarded-* — but only when the request comes from this machine.
+  grep -q trustProxies bootstrap/app.php || sed -i.bak '/withMiddleware(function (Middleware $middleware): void {/{n;s#^\([[:space:]]*\)//[[:space:]]*$#\1$middleware->trustProxies(at: ["127.0.0.1", "::1"]);#;}' bootstrap/app.php && rm -f bootstrap/app.php.bak
 }
 
 if [ "$MODE" = "--update" ]; then
@@ -70,15 +76,29 @@ for f in database/migrations/*personal_access_tokens*; do
   [ "$(basename "$f")" = "2024_01_01_000210_create_personal_access_tokens_table.php" ] || mv "$f" database/migrations/tenant/
 done
 mv database/migrations/*permission* database/migrations/tenant/
-for kv in 'DB_CONNECTION=sqlite' 'CACHE_STORE=array' 'SESSION_DRIVER=array' 'QUEUE_CONNECTION=sync'; do
+SETTINGS=('DB_CONNECTION=sqlite' 'CACHE_STORE=array' 'SESSION_DRIVER=array' 'QUEUE_CONNECTION=sync')
+if [ "${SCHOLAR_PRODUCTION:-0}" = "1" ]; then
+  # file cache persists between requests, so login rate limits actually hold
+  SETTINGS+=('APP_ENV=production' 'APP_DEBUG=false' "APP_URL=${SCHOLAR_URL:-http://localhost}" 'CACHE_STORE=file' 'LOG_LEVEL=warning')
+fi
+for kv in "${SETTINGS[@]}"; do
   k="${kv%%=*}"; if grep -q "^$k=" .env; then sed -i.bak "s#^$k=.*#$kv#" .env; else echo "$kv" >> .env; fi; done
 sed -i.bak '/^DB_HOST=/d;/^DB_PORT=/d;/^DB_DATABASE=/d;/^DB_USERNAME=/d;/^DB_PASSWORD=/d' .env; rm -f .env.bak
+# Several PHP workers share each SQLite file: wait for locks instead of failing,
+# and use WAL so readers never block writers. School databases inherit this.
+sed -i.bak "s/'busy_timeout' => null/'busy_timeout' => 10000/; s/'journal_mode' => null/'journal_mode' => 'wal'/; s/'synchronous' => null/'synchronous' => 'normal'/" config/database.php && rm -f config/database.php.bak
 touch database/database.sqlite
 php artisan key:generate --force; php artisan config:clear
 
-echo "==> Migrate + seed control plane owner + a licensed demo school"
+echo "==> Migrate + seed control plane owner"
 php artisan migrate --force
 php artisan db:seed --class=CentralAdminSeeder --force
+
+if [ "${SCHOLAR_DEMO:-1}" = "0" ]; then
+  echo ""; echo " DONE. Backend ready at: $APP (no demo school — provision schools from the owner console)"
+  exit 0
+fi
+echo "==> Licensed demo school"
 # Demo school with a real license key, so the control plane shows it correctly.
 php artisan tinker --execute="\$l=App\Models\License::create(['key'=>App\Models\License::generateKey(),'licensee'=>'Greenfield Public School','plan'=>'pro','status'=>'active','tenant_id'=>'greenfield']); \$t=App\Models\Tenant::create(['id'=>'greenfield','name'=>'Greenfield Public School','plan'=>'pro','licensee'=>\$l->licensee,'license_key'=>\$l->key,'license_status'=>'active']); \$t->domains()->create(['domain'=>'greenfield.localhost']);"
 php artisan tenants:seed --class=RoleSeeder --force

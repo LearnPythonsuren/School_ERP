@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Scholar ERP - Brochure</title>
+<!--CONFIG-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  @page { size: A4; margin: 0; }
+  :root { --ink:#171A2B; --ink2:#4A4F66; --mute:#7A7F96; --primary:#2B4EE6; --deep:#1B34AE; --wash:#EDF0FE; --green:#0FA968; --amber:#F59E0B; --line:#E4E7F0; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; font-family: "Segoe UI", "Nirmala UI", Arial, sans-serif; color: var(--ink); background: #ccc; }
+  .ta { font-family: "Nirmala UI", "Latha", "Noto Sans Tamil", sans-serif; }
+  .page { width: 210mm; height: 297mm; margin: 0 auto 8mm; background: #fff; position: relative; overflow: hidden; page-break-after: always; display: flex; flex-direction: column; }
+  @media print { body { background: #fff; } .page { margin: 0; } }
+  .hero { background: linear-gradient(135deg, var(--deep), var(--primary) 60%, #5B72F0); color: #fff; padding: 9mm 14mm 7mm; position: relative; }
+  .hero::after { content: ""; position: absolute; right: -30mm; top: -30mm; width: 90mm; height: 90mm; border-radius: 50%; background: rgba(255,255,255,.07); }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 15pt; }
+  .mark { width: 30px; height: 30px; border-radius: 8px; background: #fff; color: var(--primary); display: grid; place-items: center; font-weight: 900; }
+  .brand small { display: block; font-size: 8.5pt; font-weight: 500; opacity: .85; }
+  h1 { font-size: 22pt; line-height: 1.15; margin: 6mm 0 2.5mm; letter-spacing: -.02em; max-width: 150mm; }
+  .ta h1 { font-size: 16pt; line-height: 1.3; margin-top: 4mm; }
+  .ta .hero { padding-bottom: 5mm; } .ta .lead { font-size: 8.8pt; line-height: 1.45; } .ta .body { padding-top: 4.5mm; } .ta h2 { font-size: 10.5pt; margin-bottom: 2mm; }
+  .ta .grid, .ta .why { margin-bottom: 3.5mm; } .ta .pcard .t { font-size: 8.2pt; } .ta .pcard .v { font-size: 12pt; } .ta .pcard .s { font-size: 7.2pt; } .ta .offer { font-size: 8pt; padding: 2mm 3mm; } .ta .fine { font-size: 7pt; }
+  .ta .cta { padding: 4mm 14mm; } .ta .cta h3 { font-size: 12pt; } .ta .cta p { font-size: 8.4pt; } .ta .contact { font-size: 9pt; }
+  .lead { font-size: 10pt; opacity: .92; max-width: 150mm; line-height: 1.5; margin: 0; }
+  .body { padding: 6mm 14mm 0; flex: 1; }
+  h2 { font-size: 11.5pt; margin: 0 0 2.5mm; color: var(--deep); }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.2mm; margin-bottom: 5mm; }
+  .tile { border: 1px solid var(--line); border-radius: 2.5mm; padding: 2.2mm 2.6mm; }
+  .tile b { display: block; font-size: 9pt; margin-bottom: .6mm; }
+  .tile span { font-size: 7.8pt; color: var(--ink2); line-height: 1.35; display: block; }
+  .ta .tile { padding: 1.8mm 2.3mm; } .ta .tile b { font-size: 8.2pt; } .ta .tile span { font-size: 6.9pt; line-height: 1.4; }
+  .why { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2mm 5mm; margin-bottom: 5mm; }
+  .why div { font-size: 8.4pt; line-height: 1.42; padding-left: 6mm; position: relative; color: var(--ink2); }
+  .why div::before { content: "\2713"; position: absolute; left: 0; color: var(--green); font-weight: 900; }
+  .why b { color: var(--ink); }
+  .price { display: grid; grid-template-columns: 1.15fr 1fr 1fr; gap: 3mm; margin-bottom: 4mm; }
+  .ta .why div { font-size: 7.3pt; line-height: 1.38; } .pcard { border-radius: 3mm; padding: 2.6mm 3.2mm; background: var(--wash); }
+  .pcard .t { font-size: 8.5pt; font-weight: 700; color: var(--deep); text-transform: uppercase; letter-spacing: .04em; }
+  .ta .pcard .t { text-transform: none; letter-spacing: 0; font-size: 9pt; }
+  .pcard .v { font-size: 13pt; font-weight: 800; margin: .6mm 0; }
+  .pcard .s { font-size: 7.8pt; color: var(--ink2); line-height: 1.4; }
+  .offer { background: #FEF3E2; color: #8A5800; border-radius: 3mm; padding: 2.4mm 3.5mm; font-size: 8.8pt; font-weight: 700; margin-bottom: 3mm; }
+  .fine { font-size: 7.6pt; color: var(--mute); }
+  .cta { background: var(--ink); color: #fff; padding: 5mm 14mm; display: flex; align-items: center; gap: 8mm; }
+  .cta h3 { margin: 0 0 1.5mm; font-size: 13pt; }
+  .cta p { margin: 0; font-size: 9pt; opacity: .85; line-height: 1.6; }
+  .cta .qr { background: #fff; padding: 2mm; border-radius: 2mm; flex: none; }
+  .cta .grow { flex: 1; }
+  .contact { font-size: 10pt; font-weight: 700; margin-top: 2mm; line-height: 1.7; }
+</style>
+</head>
+<body>
+
+<!-- ===================== PAGE 1: ENGLISH ===================== -->
+<section class="page">
+  <div class="hero">
+    <div class="brand"><div class="mark">S</div><div>Scholar ERP<small>by <span data-c="company"></span></small></div></div>
+    <h1>Run your whole school from one screen.</h1>
+    <p class="lead">Admissions to fee receipts, attendance to the school bus &mdash; one simple system for the principal, office, teachers and parents. Built for Tamil Nadu schools and supported locally from Karur.</p>
+  </div>
+  <div class="body">
+    <h2>Everything a school office needs</h2>
+    <div class="grid">
+      <div class="tile"><b>Students</b><span>Records, guardians, class lists, fee and attendance status at a glance.</span></div>
+      <div class="tile"><b>Admissions</b><span>Applications &rarr; approve &rarr; enroll as a student in one click.</span></div>
+      <div class="tile"><b>Attendance</b><span>Class-wise register (Present / Absent / Leave). Attendance % updates itself.</span></div>
+      <div class="tile"><b>Fees &amp; receipts</b><span>Invoices, part-payments, cash / UPI / bank, receipts printed on your letterhead.</span></div>
+      <div class="tile"><b>Exams &amp; results</b><span>Marks entry, automatic grades, class and exam-wise views.</span></div>
+      <div class="tile"><b>Timetable</b><span>Weekly period grid for every class, editable in seconds.</span></div>
+      <div class="tile"><b>Staff</b><span>Staff directory, departments and daily duty status.</span></div>
+      <div class="tile"><b>Library</b><span>Book catalogue, issue and return, overdue list.</span></div>
+      <div class="tile"><b>School bus</b><span>Bus list and live location shared from the driver&rsquo;s phone, shown on a map.</span></div>
+      <div class="tile"><b>Hostel</b><span>Rooms, beds, allot and vacate, occupancy at a glance.</span></div>
+      <div class="tile"><b>Announcements</b><span>Notices for parents, staff or everyone, right inside the app.</span></div>
+      <div class="tile"><b>Reports</b><span>Fee collection, attendance, results &mdash; download to Excel in one click.</span></div>
+    </div>
+
+    <h2>Why schools choose Scholar ERP</h2>
+    <div class="why">
+      <div><b>Your data stays yours.</b> Every school gets its own separate database.</div>
+      <div><b>Right access for each person.</b> Principal, accountant, teacher, driver and parent each see only their part.</div>
+      <div><b>Works on any phone or computer.</b> Nothing to install for staff &mdash; just a browser.</div>
+      <div><b>Local support.</b> We set it up, import your data and train your staff at your school.</div>
+      <div><b>Daily backups.</b> Your records are backed up every night.</div>
+      <div><b>Simple, honest pricing.</b> Pay yearly per student, a flat yearly fee, or buy it once.</div>
+    </div>
+
+    <h2>Pricing</h2>
+    <div class="price">
+      <div class="pcard"><div class="t">Per student</div><div class="v" data-p="perStudent"></div><div class="s" data-p="perStudentNote"></div></div>
+      <div class="pcard"><div class="t">Flat yearly</div><div class="v" data-p="flatFrom"></div><div class="s" data-p="flatNote"></div></div>
+      <div class="pcard"><div class="t">Buy once</div><div class="v" data-p="oneFrom"></div><div class="s" data-p="oneNote"></div></div>
+    </div>
+    <div class="offer" data-offer="en"></div>
+    <div class="fine">Prices in INR, exclusive of GST. Hosting, updates, backups and support included in yearly plans.</div>
+  </div>
+  <div class="cta">
+    <div class="grow">
+      <h3>Book a free demo at your school</h3>
+      <p>We&rsquo;ll show it with real-looking data, on your own computer or phone, in 20 minutes.</p>
+      <div class="contact"><span data-c="phone"></span> &nbsp;&middot;&nbsp; <span data-c="email"></span><br><span data-c="website"></span> &nbsp;&middot;&nbsp; <span data-c="address"></span></div>
+    </div>
+    <div class="qr" id="qr1"></div>
+  </div>
+</section>
+
+<!-- ===================== PAGE 2: TAMIL ===================== -->
+<section class="page ta" lang="ta">
+  <div class="hero">
+    <div class="brand"><div class="mark">S</div><div>Scholar ERP<small><span data-c="company"></span></small></div></div>
+    <h1>உங்கள் பள்ளி முழுவதையும் ஒரே திரையில் நிர்வகியுங்கள்.</h1>
+    <p class="lead">மாணவர் சேர்க்கை முதல் கட்டண ரசீது வரை, வருகைப் பதிவு முதல் பள்ளி வாகனம் வரை &mdash; தாளாளர், அலுவலகம், ஆசிரியர்கள், பெற்றோர் அனைவருக்கும் ஒரே எளிய மென்பொருள். தமிழ்நாட்டுப் பள்ளிகளுக்காக உருவாக்கப்பட்டது; கரூரிலிருந்தே நேரடி சேவை.</p>
+  </div>
+  <div class="body">
+    <h2>பள்ளி அலுவலகத்திற்குத் தேவையான அனைத்தும்</h2>
+    <div class="grid">
+      <div class="tile"><b>மாணவர் விவரங்கள்</b><span>மாணவர், பெற்றோர் விவரம், வகுப்புப் பட்டியல், கட்டண &amp; வருகை நிலை.</span></div>
+      <div class="tile"><b>மாணவர் சேர்க்கை</b><span>விண்ணப்பம் &rarr; ஒப்புதல் &rarr; ஒரே சொடுக்கில் மாணவராகச் சேர்க்கை.</span></div>
+      <div class="tile"><b>வருகைப் பதிவு</b><span>வகுப்பு வாரியான பதிவேடு. வருகை சதவீதம் தானாகக் கணக்கிடப்படும்.</span></div>
+      <div class="tile"><b>கட்டணம் &amp; ரசீது</b><span>பகுதி கட்டணம், ரொக்கம் / UPI / வங்கி, பள்ளி முகப்புடன் ரசீது அச்சு.</span></div>
+      <div class="tile"><b>தேர்வு முடிவுகள்</b><span>மதிப்பெண் பதிவு, தானியங்கி கிரேடு, வகுப்பு வாரியான பார்வை.</span></div>
+      <div class="tile"><b>கால அட்டவணை</b><span>ஒவ்வொரு வகுப்பிற்கும் வாராந்திர பாட வேளை அட்டவணை.</span></div>
+      <div class="tile"><b>பணியாளர்கள்</b><span>ஆசிரியர் &amp; பணியாளர் பட்டியல், துறைகள், தினசரி நிலை.</span></div>
+      <div class="tile"><b>நூலகம்</b><span>புத்தகப் பட்டியல், வழங்கல் &amp; திரும்பப் பெறுதல், தாமதப் பட்டியல்.</span></div>
+      <div class="tile"><b>பள்ளி வாகனம்</b><span>ஓட்டுநரின் கைபேசியிலிருந்து பேருந்தின் இருப்பிடம் வரைபடத்தில்.</span></div>
+      <div class="tile"><b>விடுதி</b><span>அறைகள், படுக்கைகள், ஒதுக்கீடு, காலியிடம் ஒரே பார்வையில்.</span></div>
+      <div class="tile"><b>அறிவிப்புகள்</b><span>பெற்றோர், பணியாளர் அல்லது அனைவருக்கும் செயலியிலேயே அறிவிப்பு.</span></div>
+      <div class="tile"><b>அறிக்கைகள்</b><span>கட்டண வசூல், வருகை, தேர்வு முடிவுகள் &mdash; ஒரே சொடுக்கில் Excel.</span></div>
+    </div>
+
+    <h2>பள்ளிகள் ஏன் Scholar ERP-ஐத் தேர்வு செய்கின்றன</h2>
+    <div class="why">
+      <div><b>உங்கள் தரவு உங்களுக்கே.</b> ஒவ்வொரு பள்ளிக்கும் தனி தரவுத்தளம்.</div>
+      <div><b>ஒவ்வொருவருக்கும் சரியான அனுமதி.</b> தாளாளர், கணக்காளர், ஆசிரியர், ஓட்டுநர், பெற்றோர் &mdash; தங்கள் பகுதியை மட்டும் பார்ப்பார்கள்.</div>
+      <div><b>எந்த கைபேசியிலும், கணினியிலும்.</b> எதையும் நிறுவத் தேவையில்லை.</div>
+      <div><b>உள்ளூர் சேவை.</b> நிறுவுதல், தரவு பதிவேற்றம், பணியாளர் பயிற்சி &mdash; உங்கள் பள்ளியிலேயே.</div>
+      <div><b>தினசரி காப்புப்பிரதி.</b> ஒவ்வொரு இரவும் உங்கள் தரவு பாதுகாக்கப்படும்.</div>
+      <div><b>எளிய, வெளிப்படையான கட்டணம்.</b> மாணவருக்கு ஆண்டுக் கட்டணம், நிலையான ஆண்டுக் கட்டணம் அல்லது ஒருமுறை வாங்குதல்.</div>
+    </div>
+
+    <h2>கட்டண விவரம்</h2>
+    <div class="price">
+      <div class="pcard"><div class="t">ஒரு மாணவருக்கு</div><div class="v" data-p="perStudentTa"></div><div class="s" data-p="perStudentNoteTa"></div></div>
+      <div class="pcard"><div class="t">நிலையான ஆண்டுக் கட்டணம்</div><div class="v" data-p="flatFromTa"></div><div class="s" data-p="flatNoteTa"></div></div>
+      <div class="pcard"><div class="t">ஒருமுறை வாங்குதல்</div><div class="v" data-p="oneFromTa"></div><div class="s" data-p="oneNoteTa"></div></div>
+    </div>
+    <div class="offer" data-offer="ta"></div>
+    <div class="fine">விலைகள் இந்திய ரூபாயில், GST தனி. ஆண்டுத் திட்டங்களில் ஹோஸ்டிங், புதுப்பிப்புகள், காப்புப்பிரதி, சேவை அடங்கும்.</div>
+  </div>
+  <div class="cta">
+    <div class="grow">
+      <h3>உங்கள் பள்ளியில் இலவச டெமோ</h3>
+      <p>உங்கள் கணினி அல்லது கைபேசியிலேயே 20 நிமிடங்களில் நேரடியாகக் காட்டுகிறோம்.</p>
+      <div class="contact"><span data-c="phone"></span> &nbsp;&middot;&nbsp; <span data-c="email"></span><br><span data-c="website"></span> &nbsp;&middot;&nbsp; <span data-c="address"></span></div>
+    </div>
+    <div class="qr" id="qr2"></div>
+  </div>
+</section>
+
+<script>
+(function () {
+  var C = window.CFG, P = C.pricing;
+  var inr = function (n) { return "₹" + Number(n).toLocaleString("en-IN"); };
+  var flat0 = P.flat[0], one0 = P.oneTime[0];
+  var text = {
+    perStudent: inr(P.perStudent.rate) + " / student / year",
+    perStudentNote: "Minimum " + inr(P.perStudent.minimum) + " a year. Grows with your school.",
+    perStudentTa: inr(P.perStudent.rate) + " / ஆண்டு",
+    perStudentNoteTa: "குறைந்தபட்சம் ஆண்டுக்கு " + inr(P.perStudent.minimum) + ".",
+    flatFrom: "from " + inr(flat0.price),
+    flatNote: P.flat.map(function (f) { return f.plan + " (up to " + f.students + "): " + inr(f.price); }).join(" · "),
+    flatNoteTa: P.flat.map(function (f) { return f.students + " மாணவர் வரை: " + inr(f.price); }).join(" · "),
+    oneFrom: "from " + inr(one0.price),
+    flatFromTa: inr(flat0.price) + " முதல்",
+    oneFromTa: inr(one0.price) + " முதல்",
+    oneNote: "Installed on your own computer. " + P.amcPercent + "% yearly maintenance (optional).",
+    oneNoteTa: "உங்கள் கணினியிலேயே நிறுவப்படும். ஆண்டுப் பராமரிப்பு " + P.amcPercent + "% (விருப்பம்)."
+  };
+  document.querySelectorAll("[data-p]").forEach(function (el) { el.textContent = text[el.dataset.p]; });
+  document.querySelectorAll("[data-c]").forEach(function (el) { el.textContent = C[el.dataset.c]; });
+  document.querySelectorAll("[data-offer]").forEach(function (el) {
+    if (P.launchOffer.active) el.textContent = P.launchOffer[el.dataset.offer]; else el.remove();
+  });
+  var wa = "https://wa.me/" + C.whatsapp + "?text=" + encodeURIComponent("Hello, I would like a free demo of Scholar ERP for our school.");
+  ["qr1", "qr2"].forEach(function (id) {
+    if (window.QRCode) new QRCode(document.getElementById(id), { text: wa, width: 84, height: 84, correctLevel: QRCode.CorrectLevel.M });
+  });
+})();
+</script>
+</body>
+</html>

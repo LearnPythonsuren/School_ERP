@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scholar ERP - Quotation</title>
+<!--CONFIG-->
+<style>
+  @page { size: A4; margin: 0; }
+  :root { --ink:#171A2B; --ink2:#4A4F66; --mute:#7A7F96; --primary:#2B4EE6; --deep:#1B34AE; --wash:#EDF0FE; --line:#E4E7F0; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; font-family: "Segoe UI", "Nirmala UI", Arial, sans-serif; color: var(--ink); background: #EEF0F5; }
+  .form { max-width: 210mm; margin: 16px auto; background: #fff; border-radius: 12px; padding: 16px 18px; box-shadow: 0 4px 20px rgba(0,0,0,.06); }
+  .form h2 { margin: 0 0 4px; font-size: 17px; }
+  .form p { margin: 0 0 12px; color: var(--mute); font-size: 13px; }
+  .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px 12px; }
+  label { font-size: 12px; font-weight: 700; color: var(--ink2); display: block; margin-bottom: 4px; }
+  input, select { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; font: inherit; font-size: 14px; }
+  .checks { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 12px; font-size: 13px; }
+  .checks label { display: flex; gap: 6px; align-items: center; font-weight: 600; margin: 0; }
+  .checks input { width: auto; }
+  button { margin-top: 14px; background: var(--primary); color: #fff; border: 0; border-radius: 8px; padding: 10px 18px; font-weight: 700; font-size: 14px; cursor: pointer; }
+  .page { width: 210mm; min-height: 297mm; margin: 0 auto 16px; background: #fff; padding: 14mm; }
+  @media print { body { background: #fff; } .form { display: none; } .page { margin: 0; } }
+  header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid var(--primary); padding-bottom: 5mm; margin-bottom: 6mm; }
+  .brand { display: flex; gap: 3mm; align-items: center; }
+  .mark { width: 11mm; height: 11mm; border-radius: 3mm; background: linear-gradient(135deg, var(--deep), var(--primary)); color: #fff; display: grid; place-items: center; font-weight: 900; font-size: 16pt; }
+  .brand b { font-size: 15pt; } .brand small { display: block; color: var(--mute); font-size: 9pt; }
+  .meta { text-align: right; font-size: 9.5pt; color: var(--ink2); line-height: 1.6; }
+  .meta h1 { margin: 0 0 1mm; font-size: 17pt; color: var(--ink); letter-spacing: .04em; }
+  .to { display: flex; justify-content: space-between; gap: 8mm; margin-bottom: 6mm; font-size: 10pt; line-height: 1.6; }
+  .to .lbl { font-size: 8.5pt; color: var(--mute); text-transform: uppercase; letter-spacing: .05em; font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; font-size: 10pt; }
+  th { background: var(--wash); color: var(--deep); text-align: left; padding: 2.5mm 3mm; font-size: 9pt; }
+  td { padding: 2.5mm 3mm; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .r { text-align: right; white-space: nowrap; }
+  .totals td { border: 0; padding: 1.5mm 3mm; }
+  .totals td { white-space: nowrap; } .totals .grand td { font-size: 13pt; font-weight: 800; border-top: 2px solid var(--ink); padding-top: 3mm; }
+  .terms { margin-top: 8mm; font-size: 8.8pt; color: var(--ink2); line-height: 1.6; }
+  .terms h3 { font-size: 10pt; color: var(--ink); margin: 0 0 1.5mm; }
+  .terms ol { margin: 0; padding-left: 5mm; }
+  .sign { display: flex; justify-content: space-between; margin-top: 16mm; font-size: 9.5pt; }
+  .sign div { border-top: 1px solid var(--ink2); padding-top: 2mm; width: 60mm; text-align: center; }
+  .words { font-size: 9pt; color: var(--ink2); margin-top: 2mm; font-style: italic; }
+</style>
+</head>
+<body>
+
+<div class="form">
+  <h2>Make a quotation</h2>
+  <p>Fill in the school&rsquo;s details; the quotation below updates as you type. Then click Print / Save as PDF.</p>
+  <div class="fields">
+    <div><label for="school">School name</label><input id="school" placeholder="e.g. Sri Vidya Matric Hr. Sec. School"></div>
+    <div><label for="place">Town</label><input id="place" placeholder="Karur"></div>
+    <div><label for="person">Attention (person)</label><input id="person" placeholder="Correspondent / Principal"></div>
+    <div><label for="students">Number of students</label><input id="students" type="number" min="1" value="400"></div>
+    <div><label for="model">Pricing option</label><select id="model"></select></div>
+    <div><label for="years">Years (yearly plans)</label><select id="years"><option>1</option><option>2</option><option>3</option></select></div>
+    <div><label for="extra">Extra discount %</label><input id="extra" type="number" min="0" max="50" value="0"></div>
+  </div>
+  <div class="checks">
+    <label><input type="checkbox" id="offer" checked> Apply launch offer</label>
+    <label><input type="checkbox" id="setup" checked> Charge setup &amp; data import</label>
+    <label><input type="checkbox" id="amc" checked> Include 1st year maintenance (one-time license)</label>
+  </div>
+  <div id="warn" style="color:#B8770B;font-weight:700;font-size:13px;margin-top:10px"></div>
+  <button onclick="window.print()">Print / Save as PDF</button>
+</div>
+
+<div class="page">
+  <header>
+    <div class="brand"><div class="mark">S</div><div><b data-c="company"></b><small><span data-c="address"></span> &middot; <span data-c="phone"></span> &middot; <span data-c="email"></span></small></div></div>
+    <div class="meta"><h1>QUOTATION</h1>No: <b id="qno"></b><br>Date: <span id="qdate"></span><br>Valid until: <span id="qvalid"></span></div>
+  </header>
+  <div class="to">
+    <div><div class="lbl">To</div><b id="oSchool"></b><br><span id="oPerson"></span><br><span id="oPlace"></span></div>
+    <div style="text-align:right"><div class="lbl">Subject</div>Scholar ERP &mdash; school management software<br><span id="oModel"></span></div>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Description</th><th class="r">Qty</th><th class="r">Rate</th><th class="r">Amount</th></tr></thead>
+    <tbody id="lines"></tbody>
+  </table>
+  <table class="totals" style="margin-top:2mm"><tbody id="totals"></tbody></table>
+  <div class="words" id="words"></div>
+  <div class="terms">
+    <h3>What&rsquo;s included</h3>
+    <ol>
+      <li>All modules: students, admissions, attendance, fees &amp; receipts, exams, timetable, staff, library, transport, hostel, announcements, reports, users &amp; roles.</li>
+      <li>Setup of the school&rsquo;s private database, import of existing student data (Excel), and training for office staff and teachers.</li>
+      <li id="tSupport"></li>
+    </ol>
+    <h3 style="margin-top:3mm">Terms</h3>
+    <ol>
+      <li>Prices in Indian Rupees; GST at 18% as shown.</li>
+      <li id="tPay"></li>
+      <li>This quotation is valid for 30 days from the date above.</li>
+      <li>School data belongs to the school and can be exported at any time.</li>
+    </ol>
+  </div>
+  <div class="sign"><div>For <span data-c="company"></span></div><div>Accepted by (school)</div></div>
+</div>
+
+<script>
+(function () {
+  var C = window.CFG, P = C.pricing, $ = function (id) { return document.getElementById(id); };
+  var inr = function (n) { return "₹" + Math.round(n).toLocaleString("en-IN"); };
+  document.querySelectorAll("[data-c]").forEach(function (el) { el.textContent = C[el.dataset.c]; });
+
+  var models = [{ v: "ps", l: "Per student / year (" + inr(P.perStudent.rate) + ")" }];
+  P.flat.forEach(function (f, i) { models.push({ v: "f" + i, l: "Flat yearly – " + f.plan + " (up to " + f.students + ")" }); });
+  P.oneTime.forEach(function (o, i) { models.push({ v: "o" + i, l: "One-time license – " + o.plan }); });
+  $("model").innerHTML = models.map(function (m) { return '<option value="' + m.v + '">' + m.l + "</option>"; }).join("");
+  if (!P.launchOffer.active) { $("offer").checked = false; $("offer").parentNode.style.display = "none"; }
+
+  var now = new Date(), fmt = function (d) { return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }); };
+  $("qno").textContent = "Q-" + now.toISOString().slice(0, 10).replace(/-/g, "") + "-" + String(now.getHours()) + String(now.getMinutes()).padStart(2, "0");
+  $("qdate").textContent = fmt(now);
+  $("qvalid").textContent = fmt(new Date(now.getTime() + 30 * 864e5));
+
+  // Indian-system amount in words, e.g. "Rupees Fifty-Six Thousand Six Hundred Forty only"
+  function words(n) {
+    var a = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+    var b = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+    var two = function (x) { return x < 20 ? a[x] : b[Math.floor(x / 10)] + (x % 10 ? "-" + a[x % 10] : ""); };
+    var three = function (x) { return (x >= 100 ? a[Math.floor(x / 100)] + " Hundred" + (x % 100 ? " " : "") : "") + (x % 100 ? two(x % 100) : ""); };
+    n = Math.round(n); if (!n) return "Zero";
+    var parts = [], cr = Math.floor(n / 1e7), lk = Math.floor(n / 1e5) % 100, th = Math.floor(n / 1e3) % 100, rest = n % 1000;
+    if (cr) parts.push(three(cr) + " Crore"); if (lk) parts.push(two(lk) + " Lakh"); if (th) parts.push(two(th) + " Thousand"); if (rest) parts.push(three(rest));
+    return parts.join(" ");
+  }
+
+  function render() {
+    var school = $("school").value || "[School name]", students = Math.max(1, +$("students").value || 1), m = $("model").value;
+    var years = +$("years").value, lines = [], yearly = m[0] !== "o", warn = "";
+    $("oSchool").textContent = school; $("oPerson").textContent = $("person").value ? "Attn: " + $("person").value : ""; $("oPlace").textContent = $("place").value;
+    $("years").disabled = !yearly; $("amc").disabled = yearly;
+
+    if (m === "ps") {
+      var annual = Math.max(P.perStudent.minimum, students * P.perStudent.rate);
+      lines.push(["Scholar ERP subscription – per student, per year" + (annual > students * P.perStudent.rate ? " (annual minimum applies)" : ""), students + " × " + years + " yr", inr(P.perStudent.rate), annual * years]);
+    } else if (m[0] === "f") {
+      var f = P.flat[+m.slice(1)];
+      if (students > f.students) warn = students + " students is above the " + f.plan + " limit (" + f.students + ") - choose a bigger plan.";
+      lines.push(["Scholar ERP " + f.plan + " plan – flat yearly fee (up to " + f.students + " students)", years + " yr", inr(f.price), f.price * years]);
+    } else {
+      var o = P.oneTime[+m.slice(1)];
+      lines.push(["Scholar ERP " + o.plan + " – one-time license (" + (o.students ? "up to " + o.students : "unlimited") + " students), installation on school computer", "1", inr(o.price), o.price]);
+      if ($("amc").checked) lines.push(["Yearly maintenance – updates, remote support, backup checks (" + P.amcPercent + "%), first year", "1 yr", inr(o.price * P.amcPercent / 100), o.price * P.amcPercent / 100]);
+    }
+    var prepaid = yearly && years >= 1;
+    if ($("setup").checked) lines.push(["Setup, data import from Excel and staff training" + (prepaid ? " (waived with yearly prepayment)" : ""), "1", inr(P.setupFee), prepaid ? 0 : P.setupFee]);
+
+    $("lines").innerHTML = lines.map(function (l, i) { return "<tr><td>" + (i + 1) + "</td><td>" + l[0] + '</td><td class="r">' + l[1] + '</td><td class="r">' + l[2] + '</td><td class="r">' + inr(l[3]) + "</td></tr>"; }).join("");
+    var sub = lines.reduce(function (s, l) { return s + l[3]; }, 0), rows = [["Subtotal", sub]], total = sub;
+    if ($("offer").checked && P.launchOffer.active) {
+      var first = lines[0][3] / (yearly ? years : 1), d = first * P.launchOffer.percent / 100;
+      rows.push(["Launch offer (" + P.launchOffer.percent + "% off first year)", -d]); total -= d;
+    }
+    var extra = Math.min(50, Math.max(0, +$("extra").value || 0));
+    if (extra) { var e = total * extra / 100; rows.push(["Additional discount (" + extra + "%)", -e]); total -= e; }
+    var gst = total * 0.18; rows.push(["Taxable value", total], ["GST @ 18%", gst]); total += gst;
+    $("totals").innerHTML = rows.map(function (r) { return '<tr><td style="width:45%"></td><td>' + r[0] + '</td><td class="r">' + (r[1] < 0 ? "− " : "") + inr(Math.abs(r[1])) + "</td></tr>"; }).join("") +
+      '<tr class="grand"><td></td><td>Total payable</td><td class="r">' + inr(total) + "</td></tr>";
+    $("warn").textContent = warn;
+    $("words").textContent = "Rupees " + words(total) + " only.";
+    $("oModel").textContent = models.filter(function (x) { return x.v === m; })[0].l;
+    $("tSupport").textContent = yearly ? "Hosting on our secure server, all updates, nightly backups and support for the period above." :
+      "Installation on the school's computer and support for the first year" + ($("amc").checked ? "; maintenance renews yearly at " + P.amcPercent + "% of the license price." : ".");
+    $("tPay").textContent = yearly ? "Payment in advance for the period quoted; access starts on receipt of payment." : "50% on order, 50% after installation and training.";
+  }
+  document.querySelectorAll("input, select").forEach(function (el) { el.addEventListener("input", render); el.addEventListener("change", render); });
+  var q = new URLSearchParams(location.search); if (q.get("print")) { $("school").value = "Sri Vidya Matriculation Hr. Sec. School"; $("place").value = "Karur"; $("person").value = "The Correspondent"; }
+  render();
+})();
+</script>
+</body>
+</html>

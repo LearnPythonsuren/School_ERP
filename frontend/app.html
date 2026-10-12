@@ -616,6 +616,7 @@
         <select id="fee" aria-label="Fee status">${opts([["","Any fee status"],["paid","Paid"],["partial","Partial"],["due","Due"]], st.fee)}</select>
         <div class="sp"></div>
         ${can("admin","accountant") ? `<button class="btn" id="exp">Export CSV</button>` : ""}
+        ${admin ? `<button class="btn" id="imp">Import from Excel</button>` : ""}
         ${admin ? `<button class="btn primary" id="add">${svg(I.plus)} Add student</button>` : ""}
       </div><div class="panel" id="list"><div class="empty">Loading…</div></div>`;
     const load = guarded(async () => {
@@ -653,8 +654,61 @@
     $("#fee").onchange = () => { st.fee = $("#fee").value; st.page = 1; load(); };
     if ($("#add")) $("#add").onclick = () => edit(null);
     if ($("#exp")) $("#exp").onclick = guarded(() => download("/api/reports/export/students", "students.csv"));
+    if ($("#imp")) $("#imp").onclick = () => importStudents(() => { CFG.classes = []; st.page = 1; load(); });
     await load();
   };
+
+  // ---- Student import (Excel -> "Save as CSV") ----
+  function parseCsv(text){
+    text = text.replace(/^﻿/, "");
+    const first = text.split(/\r?\n/)[0] || "";
+    const sep = [",", ";", "\t"].sort((a,b) => first.split(b).length - first.split(a).length)[0];
+    const rows = []; let row = [], cell = "", q = false;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (q) { if (ch === '"') { if (text[i+1] === '"') { cell += '"'; i++; } else q = false; } else cell += ch; }
+      else if (ch === '"') q = true;
+      else if (ch === sep) { row.push(cell); cell = ""; }
+      else if (ch === "\n" || ch === "\r") { if (ch === "\r" && text[i+1] === "\n") i++; row.push(cell); rows.push(row); row = []; cell = ""; }
+      else cell += ch;
+    }
+    if (cell !== "" || row.length) { row.push(cell); rows.push(row); }
+    return rows.filter(r => r.some(x => x.trim() !== ""));
+  }
+  const IMPORT_COLS = {
+    name: ["name","student name","student","student_name","full name"],
+    class_name: ["class","class_name","class name","std","standard","class & section","class/section"],
+    roll_no: ["roll","roll no","roll_no","roll number","roll no."],
+    guardian_name: ["guardian","guardian name","guardian_name","parent","parent name","father name","father","mother name"],
+    guardian_phone: ["phone","mobile","mobile no","mobile number","guardian phone","guardian_phone","contact","parent phone","phone number"],
+  };
+  function importStudents(done){
+    let rows = null;
+    form({ title:"Import students from Excel", wide:true, fields:[], actions:[{ name:"import", label:"Import students", kind:"primary" }],
+      html:`<p class="muted" style="margin:0 0 10px">In Excel choose <b>File → Save As → CSV (Comma delimited)</b>. Columns needed: <b>Name</b> and <b>Class</b>; optional: Roll, Guardian, Phone. Format the phone column as <i>Text</i> so numbers are not shortened. <a href="#" id="tplLink">Download a template</a>.</p>
+        <input type="file" id="csvFile" accept=".csv,text/csv"><div id="csvPrev" style="margin-top:12px"></div>`,
+      onSubmit: async () => {
+        if (!rows || !rows.length) throw new Error("Choose a CSV file with at least one student.");
+        try { const r = await api("/api/students/import", { method:"POST", body:{ rows } }); toast(r.message); done(); }
+        catch(e){ if (e.errors && e.errors.rows) { $("#csvPrev").innerHTML = `<div class="err show">Nothing was imported. Fix these rows in the file and try again:<ul style="margin:6px 0 0">${e.errors.rows.map(m => `<li>${esc(m)}</li>`).join("")}</ul></div>`; throw Object.assign(new Error("Some rows need fixing (listed below)."), {}); } throw e; }
+      } });
+    $("#tplLink").onclick = (e) => { e.preventDefault();
+      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿Name,Class,Roll,Guardian,Phone\nAarav Kumar,Class 6-A,1,Ramesh Kumar,9876543210\n"], { type:"text/csv" }));
+      a.download = "students-template.csv"; document.body.appendChild(a); a.click(); a.remove(); };
+    $("#csvFile").onchange = async (e) => {
+      const file = e.target.files[0]; const prev = $("#csvPrev"); rows = null;
+      if (!file) return;
+      const data = parseCsv(await file.text());
+      if (data.length < 2) { prev.innerHTML = errBox("The file has no student rows below the header."); return; }
+      const head = data[0].map(h => h.trim().toLowerCase());
+      const idx = {}; Object.entries(IMPORT_COLS).forEach(([k, names]) => { idx[k] = head.findIndex(h => names.includes(h)); });
+      if (idx.name < 0 || idx.class_name < 0) { prev.innerHTML = errBox(`Couldn't find the ${idx.name < 0 ? "Name" : "Class"} column. Headers found: ${data[0].join(", ")}`); return; }
+      rows = data.slice(1).map(r => { const o = {}; Object.keys(IMPORT_COLS).forEach(k => { const val = idx[k] >= 0 ? (r[idx[k]] || "").trim() : ""; o[k] = val === "" ? null : (k === "roll_no" ? (Number(val) || null) : val); }); return o; });
+      const used = Object.keys(IMPORT_COLS).filter(k => idx[k] >= 0);
+      prev.innerHTML = `<div class="note" style="background:var(--green-wash);color:var(--green)">${rows.length} students ready to import. Columns used: ${used.join(", ")}.</div>` +
+        table(used.map(k => ({ h:k.replace("_"," "), f:r => esc(r[k] ?? "—") })), rows.slice(0, 5)) + (rows.length > 5 ? `<div class="small muted" style="padding:6px 2px">…and ${rows.length - 5} more</div>` : "");
+    };
+  }
 
   SCHOOL.admissions = async (v) => {
     const st = vs("admissions", { status:"pending", q:"", page:1 });

@@ -1,0 +1,33 @@
+{
+  "_note": "Edit this file, then run: powershell -ExecutionPolicy Bypass -File marketing\\build.ps1  (rebuilds the website and all PDFs). Prices are in INR and exclude 18% GST.",
+
+  "company": "Chenthur Info Tech",
+  "product": "Scholar ERP",
+  "phone": "+91 00000 00000",
+  "whatsapp": "910000000000",
+  "email": "sales@yourdomain.com",
+  "website": "https://erp.yourdomain.com",
+  "address": "Karur, Tamil Nadu",
+  "appUrl": "/app.html",
+
+  "pricing": {
+    "perStudent": { "rate": 100, "minimum": 12000 },
+    "flat": [
+      { "plan": "Starter",    "students": 300,  "price": 24000 },
+      { "plan": "Pro",        "students": 800,  "price": 48000 },
+      { "plan": "Enterprise", "students": 2000, "price": 90000 }
+    ],
+    "oneTime": [
+      { "plan": "Pro",        "students": 800,  "price": 60000 },
+      { "plan": "Enterprise", "students": 0,    "price": 100000 }
+    ],
+    "amcPercent": 18,
+    "setupFee": 5000,
+    "launchOffer": {
+      "active": true,
+      "en": "Launch offer for the first 10 schools in Karur district: 25% off the first year + free data import.",
+      "ta": "கரூர் மாவட்டத்தின் முதல் 10 பள்ளிகளுக்கு அறிமுகச் சலுகை: முதல் ஆண்டு 25% தள்ளுபடி + இலவச தரவு பதிவேற்றம்.",
+      "percent": 25
+    }
+  }
+}

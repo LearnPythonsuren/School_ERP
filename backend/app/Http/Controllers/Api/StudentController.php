@@ -7,6 +7,10 @@ use App\Http\Requests\StoreStudentRequest;
 use App\Http\Resources\StudentResource;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class StudentController extends Controller
 {
@@ -31,6 +35,34 @@ class StudentController extends Controller
     {
         $student = Student::create($request->validated());
         return (new StudentResource($student))->response()->setStatusCode(201);
+    }
+
+    /**
+     * Bulk import (e.g. a school's existing Excel list saved as CSV, parsed in
+     * the browser). All-or-nothing: if any row is invalid nothing is saved and
+     * every problem is reported with its row number, so the file can be fixed.
+     */
+    public function import(Request $request)
+    {
+        $request->validate(['rows' => ['required', 'array', 'min:1', 'max:3000']]);
+
+        $rules = (new StoreStudentRequest())->rules();
+        $errors = [];
+        foreach ($request->input('rows') as $i => $row) {
+            $v = Validator::make(is_array($row) ? $row : [], $rules);
+            if ($v->fails()) {
+                $errors[] = 'Row '.($i + 2).': '.implode(' ', $v->errors()->all()); // +2: header line + 1-based
+            }
+        }
+        if ($errors) {
+            throw ValidationException::withMessages(['rows' => array_slice($errors, 0, 50)]);
+        }
+
+        $created = DB::transaction(fn () => collect($request->input('rows'))
+            ->map(fn ($row) => Student::create(Arr::only($row, array_keys($rules))))
+            ->count());
+
+        return response()->json(['message' => "{$created} students imported.", 'imported' => $created], 201);
     }
 
     public function show(Student $student)

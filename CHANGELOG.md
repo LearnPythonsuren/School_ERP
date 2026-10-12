@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.3.0 - Sales & marketing kit
+
+### New
+- **Import students from Excel** (CSV): preview, flexible column names
+  ("Student Name", "Std", "Father Name", "Mobile"…), all-or-nothing with
+  row-numbered errors. `POST /api/students/import`.
+- **Demo school for sales visits:** `php artisan scholar:demo` /
+  `windows\reset-demo.ps1` rebuilds a realistic `demo` school with fresh data;
+  never touches real schools.
+- **Product website** (English / Tamil) served as the domain's home page,
+  with WhatsApp demo requests, pricing and FAQ.
+- **Sales kit** in `marketing/`: bilingual brochure, price sheet, quotation
+  maker (GST and amount in words), sales playbook, 90-day go-to-market plan,
+  pipeline tracker. One `config.json` drives every document.
+- CI fails if a Windows script contains non-ASCII characters (PowerShell 5
+  misreads them).
+
 ## 1.2.0 — Windows hosting
 
 ### New

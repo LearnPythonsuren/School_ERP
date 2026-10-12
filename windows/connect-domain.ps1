@@ -6,7 +6,7 @@
   Recommended: Cloudflare Tunnel. No router port-forwarding or static IP,
   works on home/office broadband, HTTPS handled by Cloudflare.
 
-  Before running (one time, in the Cloudflare dashboard — free plan):
+  Before running (one time, in the Cloudflare dashboard - free plan):
     1. Add your domain to Cloudflare (its nameservers must point to Cloudflare).
     2. Zero Trust > Networks > Tunnels > Create a tunnel > "Cloudflared".
        Copy the token from the install command it shows (the long eyJ... string).

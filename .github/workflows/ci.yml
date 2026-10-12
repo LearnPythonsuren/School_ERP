@@ -20,6 +20,10 @@ jobs:
             php -l "$f" | grep -q "No syntax errors" || { echo "FAIL $f"; fail=1; }
           done
           [ "$fail" = "0" ] && echo "All backend PHP files pass."; exit $fail
+      - name: Windows scripts are plain ASCII (PowerShell 5 misreads UTF-8 without BOM)
+        run: |
+          if grep -nP '[^\x00-\x7F]' windows/*.ps1 marketing/*.ps1; then echo "Non-ASCII characters above - replace them"; exit 1; fi
+          echo "PowerShell scripts OK"
       - name: JS syntax check (both frontends)
         run: |
           for f in frontend/index.html frontend/app.html; do

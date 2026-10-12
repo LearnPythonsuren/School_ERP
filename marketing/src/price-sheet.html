@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Scholar ERP - Price sheet</title>
+<!--CONFIG-->
+<style>
+  @page { size: A4; margin: 0; }
+  :root { --ink:#171A2B; --ink2:#4A4F66; --mute:#7A7F96; --primary:#2B4EE6; --deep:#1B34AE; --wash:#EDF0FE; --line:#E4E7F0; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; font-family: "Segoe UI", "Nirmala UI", Arial, sans-serif; color: var(--ink); background: #ccc; }
+  .ta { font-family: "Nirmala UI", "Latha", sans-serif; color: var(--ink2); font-weight: 500; }
+  .page { width: 210mm; height: 297mm; overflow: hidden; margin: 0 auto; background: #fff; padding: 12mm 14mm; }
+  @media print { body { background: #fff; } }
+  header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid var(--primary); padding-bottom: 4mm; margin-bottom: 5mm; }
+  header h1 { margin: 0; font-size: 21pt; letter-spacing: -.02em; }
+  header .sub { color: var(--mute); font-size: 10pt; margin-top: 1mm; }
+  header .co { text-align: right; font-size: 9pt; color: var(--ink2); line-height: 1.5; }
+  h2 { font-size: 13pt; margin: 0 0 1mm; color: var(--deep); }
+  h2 .ta { font-size: 10.5pt; margin-left: 2mm; }
+  .intro { font-size: 9.4pt; color: var(--ink2); margin: 0 0 3mm; line-height: 1.5; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 5mm; font-size: 9.6pt; }
+  th { background: var(--wash); color: var(--deep); text-align: left; padding: 2mm 3mm; font-size: 8.8pt; }
+  td { padding: 2mm 3mm; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td.num { text-align: right; font-weight: 800; white-space: nowrap; }
+  .incl { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2mm 8mm; font-size: 9pt; color: var(--ink2); margin-bottom: 5mm; }
+  .incl div::before { content: "\2713  "; color: #0FA968; font-weight: 900; }
+  .offer { background: #FEF3E2; color: #8A5800; border-radius: 3mm; padding: 3mm 4mm; font-size: 9.4pt; font-weight: 700; margin-bottom: 4mm; line-height: 1.5; }
+  .fine { font-size: 8.3pt; color: var(--mute); line-height: 1.6; }
+  .pick { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; margin-bottom: 5mm; }
+  .pick div { border: 1px solid var(--line); border-radius: 3mm; padding: 3mm; font-size: 9pt; line-height: 1.45; color: var(--ink2); }
+  .pick b { display: block; color: var(--ink); font-size: 9.6pt; margin-bottom: 1mm; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div><h1>Scholar ERP &mdash; Price sheet</h1><div class="sub">School management software &middot; <span class="ta">கட்டண விவரம்</span></div></div>
+    <div class="co"><b data-c="company"></b><br><span data-c="phone"></span><br><span data-c="email"></span><br><span data-c="address"></span></div>
+  </header>
+
+  <h2>Which option suits you? <span class="ta">உங்களுக்கு எது பொருந்தும்?</span></h2>
+  <div class="pick">
+    <div><b>Per student / year</b>Pay only for the students you have. Best for growing schools. <span class="ta">வளரும் பள்ளிகளுக்கு ஏற்றது.</span></div>
+    <div><b>Flat yearly</b>One fixed fee, easy to budget. Best value when you fill your plan. <span class="ta">நிலையான கட்டணம், திட்டமிட எளிது.</span></div>
+    <div><b>Buy once</b>Installed on your own computer; optional yearly maintenance. <span class="ta">ஒருமுறை வாங்கி, உங்கள் கணினியில் நிறுவுதல்.</span></div>
+  </div>
+
+  <h2>1 &middot; Per student, per year <span class="ta">ஒரு மாணவருக்கு ஆண்டுக் கட்டணம்</span></h2>
+  <p class="intro">Hosted by us. Includes every module, updates, nightly backups and support.</p>
+  <table><thead><tr><th>Plan</th><th>Rate</th><th>Minimum per year</th><th>Example: 400 students</th></tr></thead><tbody id="perStudent"></tbody></table>
+
+  <h2>2 &middot; Flat yearly fee <span class="ta">நிலையான ஆண்டுக் கட்டணம்</span></h2>
+  <p class="intro">Hosted by us. All modules in every plan; plans differ by number of students and support level.</p>
+  <table><thead><tr><th>Plan</th><th>Students</th><th>Support</th><th>Per year</th></tr></thead><tbody id="flat"></tbody></table>
+
+  <h2>3 &middot; One-time license <span class="ta">ஒருமுறை உரிமம்</span></h2>
+  <p class="intro">Installed on the school&rsquo;s own Windows computer or server. You own the license; data stays on your premises.</p>
+  <table><thead><tr><th>Plan</th><th>Students</th><th>One-time price</th><th>Yearly maintenance (optional)</th></tr></thead><tbody id="one"></tbody></table>
+
+  <h2>Included in every plan <span class="ta">அனைத்து திட்டங்களிலும்</span></h2>
+  <div class="incl">
+    <div>Every module + users &amp; roles</div><div>Fee receipts with your letterhead</div>
+    <div>Excel reports &amp; data export</div><div>Separate, private database per school</div>
+    <div>Training for office staff &amp; teachers</div><div>Works on phone, tablet and computer</div>
+  </div>
+
+  <div class="offer" id="offer"></div>
+  <div class="fine" id="fine"></div>
+</div>
+<script>
+(function () {
+  var C = window.CFG, P = C.pricing;
+  var inr = function (n) { return "₹" + Number(n).toLocaleString("en-IN"); };
+  var row = function (cells) { return "<tr>" + cells.map(function (c, i) { return "<td" + (i === cells.length - 1 ? ' class="num"' : "") + ">" + c + "</td>"; }).join("") + "</tr>"; };
+  var support = { Starter: "WhatsApp & phone, online training", Pro: "Phone + on-site training (Karur region)", Enterprise: "Priority support, dedicated onboarding" };
+  document.querySelectorAll("[data-c]").forEach(function (el) { el.textContent = C[el.dataset.c]; });
+  document.getElementById("perStudent").innerHTML = row(["All modules", inr(P.perStudent.rate) + " / student", inr(P.perStudent.minimum), inr(Math.max(P.perStudent.minimum, 400 * P.perStudent.rate))]);
+  document.getElementById("flat").innerHTML = P.flat.map(function (f) { return row(["<b>" + f.plan + "</b>", "up to " + f.students.toLocaleString("en-IN"), support[f.plan] || "", inr(f.price)]); }).join("");
+  document.getElementById("one").innerHTML = P.oneTime.map(function (o) { return row(["<b>" + o.plan + "</b>", o.students ? "up to " + o.students.toLocaleString("en-IN") : "unlimited", inr(o.price), inr(Math.round(o.price * P.amcPercent / 100)) + " / year (" + P.amcPercent + "%)"]); }).join("");
+  var offer = document.getElementById("offer");
+  if (P.launchOffer.active) offer.innerHTML = P.launchOffer.en + '<br><span class="ta">' + P.launchOffer.ta + "</span>"; else offer.remove();
+  document.getElementById("fine").innerHTML = "All prices in INR, exclusive of 18% GST. One-time setup &amp; data import: " + inr(P.setupFee) +
+    " (free with yearly prepayment). Yearly plans are billed in advance. One-time licenses include installation and first-year support; maintenance covers updates, remote support and backup checks. Prices valid until revised.";
+})();
+</script>
+</body>
+</html>

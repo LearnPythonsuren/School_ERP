@@ -135,6 +135,7 @@ Route::middleware([IdentifySchool::class, EnsureLicenseActive::class])->group(fu
             Route::get('/roles', [UserController::class, 'roles']);
             Route::apiResource('users', UserController::class);
 
+            Route::post('/students/import', [StudentController::class, 'import']);
             Route::apiResource('students', StudentController::class)->only(['store', 'update', 'destroy']);
             Route::apiResource('staff', StaffController::class)->parameters(['staff' => 'staff'])->only(['store', 'update', 'destroy']);
 

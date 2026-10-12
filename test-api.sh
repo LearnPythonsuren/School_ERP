@@ -70,6 +70,12 @@ SID="$(json data.id)"
 call PUT "/api/students/$SID" '{"guardian_name":"Parent One"}'; expect "update" 200 'Parent One'
 call GET "/api/students?search=Test%20Kid"; expect "search" 200 'Test Kid'
 call POST /api/students '{"class_name":"Class 6-A"}'; expect "validation" 422 'name'
+call POST /api/students/import '{"rows":[{"name":"Imp One","class_name":"Import Test","roll_no":1},{"name":"Imp Two","class_name":"Import Test","guardian_phone":"9876543210"}]}'
+expect "bulk import" 201 '2 students imported'
+call POST /api/students/import '{"rows":[{"name":"Ok","class_name":"Import Test"},{"class_name":"Import Test"}]}'
+expect "import is all-or-nothing, reports row" 422 'Row 3'
+call GET "/api/students?class=Import%20Test"; expect "only valid batch saved" 200 '"total":2'
+for id in $(echo "$BODY" | php -r 'foreach(json_decode(stream_get_contents(STDIN),true)["data"] as $s) echo $s["id"]," ";'); do call DELETE "/api/students/$id"; done
 
 echo "== FEES (partial payments + receipt) =="
 call POST /api/fees "{\"student_id\":$SID,\"amount\":1000,\"description\":\"Bus fee\"}"; expect "create invoice (auto number)" 201 'INV-'

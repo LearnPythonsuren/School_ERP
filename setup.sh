@@ -30,6 +30,8 @@ overlay() {
   cp "$B"/routes/web.php routes/web.php
   cp "$B"/routes/tenant.php routes/tenant.php
   cp "$DIR"/frontend/app.html public/app.html   # served at /app.html, same origin as the API
+  # Product website (built by marketing/build.ps1) becomes the domain's home page.
+  if [ -f "$DIR/marketing/dist/website/index.html" ]; then cp "$DIR/marketing/dist/website/index.html" public/home.html; fi
   # Behind a local reverse proxy / Cloudflare Tunnel, take the client IP and https
   # scheme from X-Forwarded-* — but only when the request comes from this machine.
   grep -q trustProxies bootstrap/app.php || sed -i.bak '/withMiddleware(function (Middleware $middleware): void {/{n;s#^\([[:space:]]*\)//[[:space:]]*$#\1$middleware->trustProxies(at: ["127.0.0.1", "::1"]);#;}' bootstrap/app.php && rm -f bootstrap/app.php.bak

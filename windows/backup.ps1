@@ -10,6 +10,12 @@ param(
     [int]$KeepDays = 14
 )
 $ErrorActionPreference = "Stop"
+# Every run (scheduled ones especially) leaves a line in this log, so a
+# failing nightly backup is visible instead of silent.
+New-Item -ItemType Directory -Force -Path "$InstallDir\logs" | Out-Null
+$log = "$InstallDir\logs\backup.log"
+function Log($msg) { Add-Content -Path $log -Value ("{0}  {1}" -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss"), $msg) }
+trap { Log "FAILED: $($_.Exception.Message)"; throw }
 $app = "$InstallDir\app"
 $php = "$InstallDir\php\php.exe"
 $env:PHPRC = "$InstallDir\php"
@@ -27,11 +33,12 @@ foreach ($db in $dbs) {
     & $php -r "`$p = new PDO('sqlite:' . `$argv[1]); `$p->exec('PRAGMA busy_timeout = 10000'); `$p->exec('VACUUM INTO ' . `$p->quote(`$argv[2]));" $db.FullName $out
     if ($LASTEXITCODE -ne 0) { throw "Backup of $($db.Name) failed" }
 }
-# APP_KEY lives in .env — without it, encrypted data and sessions can't be restored.
+# APP_KEY lives in .env - without it, encrypted data and sessions can't be restored.
 Copy-Item "$app\.env" "$work\env.txt"
 
 Compress-Archive -Path "$work\*" -DestinationPath "$InstallDir\backups\scholar-$stamp.zip" -Force
 Remove-Item $work -Recurse -Force
 Get-ChildItem "$InstallDir\backups" -Filter "scholar-*.zip" |
     Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-$KeepDays) } | Remove-Item -Force
+Log "OK: scholar-$stamp.zip ($($dbs.Count) databases)"
 Write-Host "Backup written: $InstallDir\backups\scholar-$stamp.zip ($($dbs.Count) databases)"

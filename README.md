@@ -92,6 +92,7 @@ bash test-api.sh
 | `backend/` | Product code overlaid onto a fresh Laravel app (models, controllers, middleware, migrations, seeders, routes). API reference in [backend/README.md](backend/README.md). |
 | `setup.sh` | Fresh install (`bash setup.sh`) or in-place upgrade (`bash setup.sh --update`). |
 | `test-api.sh` | End-to-end API test suite. |
+| `docs/GOING-LIVE.md` | Start here to go live: minimal infrastructure, costs, connecting your domain, when to move to a VPS. |
 | `docs/WINDOWS.md` + `windows/` | Hosting on a Windows PC/server with IIS: one-command install, Cloudflare Tunnel for your domain, nightly backups. |
 | `docs/DEPLOYMENT.md` | Putting it on a Linux server (VPS, MySQL, HTTPS, backups, updates). |
 | `.github/workflows/ci.yml` | CI runs `setup.sh`, the full test suite and the upgrade path on every push. |

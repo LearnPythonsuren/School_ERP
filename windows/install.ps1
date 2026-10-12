@@ -43,7 +43,7 @@ if (-not $isAdmin) {
     exit $p.ExitCode
 }
 
-# Some shells start with a trimmed PATH; make sure Windows' own tools (icacls, msiexec…) resolve.
+# Some shells start with a trimmed PATH; make sure Windows' own tools (icacls, msiexec...) resolve.
 $sys = "$env:windir\System32"
 $env:PATH = "$sys;$env:windir;$sys\Wbem;$sys\WindowsPowerShell\v1.0;$env:PATH"
 
@@ -134,7 +134,7 @@ error_log = "$InstallDir\logs\php-errors.log"
         & $bash $setupSh
         if ($LASTEXITCODE -ne 0) { throw "setup.sh failed" }
         Set-Content $ownerPassFile @"
-Scholar ERP — owner console first login
+Scholar ERP - owner console first login
 Address:  $Url   (choose the "Owner console" tab)
 Email:    $OwnerEmail
 Password: $($env:CENTRAL_ADMIN_PASSWORD)
@@ -256,9 +256,18 @@ Sign in, change the password (account menu > Change password), then DELETE this 
     }
 
     Step "Nightly backup (02:00)"
-    $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$Repo\windows\backup.ps1`" -InstallDir `"$InstallDir`""
+    # Run a copy kept inside the install (not the source checkout), catch up if the
+    # PC was off at 02:00, and prove it works now by running it once.
+    Copy-Item "$Repo\windows\backup.ps1", "$Repo\windows\reset-demo.ps1" "$InstallDir\tools\" -Force
+    $action = New-ScheduledTaskAction -Execute "$sys\WindowsPowerShell\v1.0\powershell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$InstallDir\tools\backup.ps1`" -InstallDir `"$InstallDir`""
     $trigger = New-ScheduledTaskTrigger -Daily -At 2am
-    Register-ScheduledTask -TaskName "Scholar ERP backup" -Action $action -Trigger $trigger -User "SYSTEM" -RunLevel Highest -Force | Out-Null
+    $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -ExecutionTimeLimit (New-TimeSpan -Hours 1)
+    Register-ScheduledTask -TaskName "Scholar ERP backup" -Action $action -Trigger $trigger -Settings $settings -User "SYSTEM" -RunLevel Highest -Force | Out-Null
+    $before = @(Get-ChildItem "$InstallDir\backups" -Filter "scholar-*.zip").Count
+    Start-ScheduledTask -TaskName "Scholar ERP backup"
+    for ($i = 0; $i -lt 60 -and @(Get-ChildItem "$InstallDir\backups" -Filter "scholar-*.zip").Count -le $before; $i++) { Start-Sleep -Seconds 2 }
+    if (@(Get-ChildItem "$InstallDir\backups" -Filter "scholar-*.zip").Count -gt $before) { Write-Host "Scheduled backup test run: OK" -ForegroundColor Green }
+    else { Write-Host "Scheduled backup test run did not produce a file - see $InstallDir\logs\backup.log" -ForegroundColor Yellow }
 
     # --------------------------------------------------------- Health
     Step "Health check"
